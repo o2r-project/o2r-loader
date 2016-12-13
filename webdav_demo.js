@@ -4,15 +4,43 @@ var app = express();
 
 var createClient = require("webdav");
 var fs = require("fs");
+var url = require("url");
+var bodyParser = require('body-parser');
 
-var client = createClient(
-    "https://uni-muenster.sciebo.de/public.php/webdav",
-    "c7hsPIHGvgWnD6U",
-    ""
-);
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');    //allow CORS
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
+    res.setHeader('Access-Control_Allow-Headers', 'X-Requested-With, Content-Type');
+    next();
+});
 
-app.get('/api/v1/compendium', function (req, res) {
+app.post('/api/v1/compendium/', function (req, res) {
+    var share_url = req.body.shareURL;
+    //var share_url = 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U';
+    console.log('webdavurl: ' + share_url);
+
+    // Extract owncloud share token from share URL
+    var token = url.parse(share_url).path.split("/")[3];
+    console.log('token :' + token);
+
+    // Get domain name
+    var hostname = url.parse(share_url).hostname.split(".");
+
+    hostname = hostname[hostname.length - 2];
+
+    console.log('hostname: ' + hostname);
+
+    if (hostname != 'sciebo') {
+        throw new Error('Invalid file host');
+    }
+    var client = createClient(
+        "https://uni-muenster.sciebo.de/public.php/webdav",
+        token,
+        ""
+    );
+
     client
         .getDirectoryContents("/")
         .then(function (contents) {
@@ -34,14 +62,10 @@ app.get('/api/v1/compendium', function (req, res) {
             console.error(err);
         });
 
+
 });
 
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');    // allow CORS
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
-    res.setHeader('Access-Control_Allow-Headers', 'X-Requested-With, Content-Type');
-    next();
-});
+
 
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!')
