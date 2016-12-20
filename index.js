@@ -103,7 +103,7 @@ function initApp(callback) {
     /*
      * configure routes
      */
-    app.get('/api/v1/...', controllers...);
+    //app.get('/api/v1/...', controllers...);
 
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');
