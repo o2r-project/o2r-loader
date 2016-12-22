@@ -22,7 +22,7 @@ const backoff = require('backoff');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
-fse.mkdirsSync(config.fs.tmp);
+fse.mkdirsSync(config.fs.base);
 
 const dbURI = config.mongo.location + config.mongo.database;
 mongoose.connect(dbURI);
@@ -103,7 +103,7 @@ function initApp(callback) {
     /*
      * configure routes
      */
-    //app.get('/api/v1/...', controllers...);
+    app.post('/api/v1/public-share', controllers.download.create);
 
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');

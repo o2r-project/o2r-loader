@@ -54,4 +54,72 @@ c.user = {};
 c.user.level = {};
 c.user.level.load_webdav = 100;
 
+// bagtainer configuration
+c.bagtainer = {};
+c.bagtainer.supportedVersions = ['0.1'];
+c.bagtainer.payloadDirectory = '/data';
+c.bagtainer.configFile = '/data/bagtainer.yml';
+c.bagtainer.scan = {};
+c.bagtainer.scan.enable = false; // not feasible without daemon virus scanner in container
+c.bagtainer.scan.settings = { // see https://www.npmjs.com/package/clamscan
+  remove_infected: true,
+  debug_mode: true,
+  list_recursively: true,
+  //scan_log: '/var/log/clamscan.log', // file must exist!
+  /*clamdscan: {
+    config_file: '/etc/clamav/clamd.conf'
+  },*/
+  preference: 'clamdscan'
+  // clamdscan does not work in container but is _way_ faster
+};
+c.bagtainer.scan.email = {};
+c.bagtainer.scan.email.enable = true;
+c.bagtainer.scan.email.transport = env.MUNCHER_EMAIL_TRANSPORT; // https://www.npmjs.com/package/nodemailer
+c.bagtainer.scan.email.receivers = env.MUNCHER_EMAIL_RECEIVERS;
+c.bagtainer.scan.email.sender = env.MUNCHER_EMAIL_SENDER;
+c.bagtainer.bagit = {};
+c.bagtainer.bagit.validateFast = false;
+c.bagtainer.keepContainers = false; // set this to true for debugging runtime options
+c.bagtainer.keepImages = true; // required for image download!
+c.bagtainer.validateBeforeExecute = true; // cannot validate before execute when saving image tarball but not updating the bag
+c.bagtainer.bagit = {};
+c.bagtainer.bagit.failOnValidationError= {};
+c.bagtainer.bagit.failOnValidationError.upload = true;
+c.bagtainer.bagit.failOnValidationError.execute = false;
+c.bagtainer.imageNamePrefix = 'bagtainer:';
+c.bagtainer.forceImageRemoval = true;
+c.bagtainer.docker = {};
+// See https://docs.docker.com/engine/reference/commandline/create/ and https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#create-a-container
+c.bagtainer.docker.create_options = {
+  //AttachStderr: true,
+  //AttachStdin: false,
+  //AttachStdout: true,
+  //Cmd: ['bash', '-c', 'cat /etc/resolv.conf'],
+  CpuShares: 256,
+  //Cpuset: '',
+  //Domainname: '',
+  //Entrypoint: null,
+  Env: ['O2RPLATFORM=true'],
+  //Hostname: 'b9ea983254ef',
+  Memory: 1073741824, // 1G
+  MemorySwap: 2147483648, // double of 1G
+  NetworkMode: 'none',
+  Rm: true
+};
+// https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#start-a-container
+c.bagtainer.docker.start_options = {
+};
+
+c.bagtainer.metaextract = {};
+c.bagtainer.metaextract.outputDir = '.o2r';
+c.bagtainer.metaextract.targetElement = 'o2r';
+c.bagtainer.metaextract.bestCandidateFile = 'metadata.json';
+c.bagtainer.metaextract.failOnNoMetadata = false;
+c.bagtainer.metaextract.image = 'o2rproject/o2r-meta-extract:latest';
+c.bagtainer.metaextract.start_options = {};
+c.bagtainer.metaextract.create_options = {
+  CpuShares: 512,
+  NetworkMode: 'none'
+};
+
 module.exports = c;
