@@ -32,14 +32,19 @@ mongoose.connection.on('error', (err) => {
 
 // Express modules and tools
 const express = require('express');
+const compression = require('compression');
 const app = express();
-const responseTime = require('response-time')
+const responseTime = require('response-time');
+const bodyParser = require('body-parser');
 
 app.use((req, res, next) => {
   debug(req.method + ' ' + req.path);
   next();
 });
 app.use(responseTime());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 
 const url = require('url');
 

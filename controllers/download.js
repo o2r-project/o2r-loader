@@ -24,8 +24,11 @@ var dirTree = require('directory-tree');
 var rewriteTree = require('../lib/rewrite-tree');
 
 var Compendium = require('../lib/model/compendium');
-//var Job = require('../lib/model/job');
+var Job = require('../lib/model/job');
 var Uploader = require('../lib/uploader').Uploader;
+
+var url = require('url');
+
 
 exports.create = (req, res) => {
   // check user level
@@ -38,14 +41,15 @@ exports.create = (req, res) => {
     return;
   }
 
+//todo add file name / ID
   if (req.body.content_type === 'compendium_v1') {
-    debug('Creating new %s for user %s (original file name: %s)',
-      req.body.content_type, req.user.id, req.file.originalname);
+    debug('Creating new %s for user %s (original file name: )',
+      req.body.content_type, req.user.id);
 
     //TODO: is URL valid url? and does it have hostname
 
     // Check public share domain
-    var hostname = url.parse(share_url).hostname.split(".");
+    var hostname = url.parse(req.body.shareURL).hostname.split(".");
 
     hostname = hostname[hostname.length - 2];
 

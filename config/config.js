@@ -46,6 +46,8 @@ c.fs.incoming   = c.fs.base + 'incoming/';
 c.fs.compendium = c.fs.base + 'compendium/';
 c.fs.delete_inc = true;
 
+c.id_length = 5;   // length of job & compendium ids [0-9,a-z,A-Z]
+
 // session secret
 c.sessionsecret = env.SESSION_SECRET || 'o2r';
 
