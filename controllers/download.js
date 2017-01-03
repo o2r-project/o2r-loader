@@ -41,6 +41,8 @@ exports.create = (req, res) => {
     return;
   }
 
+  // sciebo check
+
 //todo add file name / ID
   if (req.body.content_type === 'compendium_v1') {
     debug('Creating new %s for user %s (original file name: )',
@@ -60,7 +62,7 @@ exports.create = (req, res) => {
       });
     } else {
       res.status(403).send('Public share host is not allowed, only "sciebo" is supported.');
-      debug('Public share host "%s" is not allowed, only "sciebo" is supported.', hostname);
+      debug('Public share host "%s" is not allowed.', hostname);
     }  
 
 
