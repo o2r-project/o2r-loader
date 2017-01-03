@@ -25,7 +25,7 @@ var rewriteTree = require('../lib/rewrite-tree');
 
 var Compendium = require('../lib/model/compendium');
 var Job = require('../lib/model/job');
-var Uploader = require('../lib/uploader').Uploader;
+var Loader = require('../lib/loader').Loader;
 
 var url = require('url');
 
@@ -41,34 +41,30 @@ exports.create = (req, res) => {
     return;
   }
 
-  // sciebo check
+  // share_url validation
+  var hostname = url.parse(req.body.share_url).hostname.split(".");
+  hostname = hostname[hostname.length - 2];
 
-//todo add file name / ID
+  if (hostname !== 'sciebo') {
+    res.status(403).send('Public share host is not allowed, only "sciebo" is supported.');
+    debug('Public share host "%s" is not allowed.', hostname);
+    return;
+  }
+
+  // path validation
+
+  // content_type validation
   if (req.body.content_type === 'compendium_v1') {
-    debug('Creating new %s for user %s (original file name: )',
+    debug('Creating new %s for user %s)',
       req.body.content_type, req.user.id);
 
-    //TODO: is URL valid url? and does it have hostname
-
-    // Check public share domain
-    var hostname = url.parse(req.body.shareURL).hostname.split(".");
-
-    hostname = hostname[hostname.length - 2];
-
-    if (hostname === 'sciebo') {
-      var uploader = new Uploader(req, res);
-      uploader.upload((id) => {
-        debug('New compendium %s successfully uploaded', id);
-      });
-    } else {
-      res.status(403).send('Public share host is not allowed, only "sciebo" is supported.');
-      debug('Public share host "%s" is not allowed.', hostname);
-    }  
-
-
+    var loader = new Loader(req, res);
+    loader.load((id) => {
+      debug('New compendium %s successfully loaded', id);
+    });
   } else {
     res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
     debug('Provided content_type "%s" not implemented', req.body.content_type);
-  }
+  } 
 };
 
