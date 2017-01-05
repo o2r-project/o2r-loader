@@ -41,7 +41,7 @@ exports.create = (req, res) => {
     return;
   }
 
-  // share_url validation
+  // validate share_url
   var hostname = url.parse(req.body.share_url).hostname.split(".");
   hostname = hostname[hostname.length - 2];
 
@@ -51,9 +51,9 @@ exports.create = (req, res) => {
     return;
   }
 
-  // path validation
+  // validate path
 
-  // content_type validation
+  // validate content_type
   if (req.body.content_type === 'compendium_v1') {
     debug('Creating new %s for user %s)',
       req.body.content_type, req.user.id);
