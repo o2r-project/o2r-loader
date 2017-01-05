@@ -23,6 +23,8 @@ const backoff = require('backoff');
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
 fse.mkdirsSync(config.fs.base);
+fse.mkdirsSync(config.fs.incoming);
+fse.mkdirsSync(config.fs.compendium);
 
 const dbURI = config.mongo.location + config.mongo.database;
 mongoose.connect(dbURI);

@@ -20,9 +20,6 @@ var c = require('../config/config');
 var debug = require('debug')('compendium');
 var fs = require('fs');
 
-var dirTree = require('directory-tree');
-var rewriteTree = require('../lib/rewrite-tree');
-
 var Compendium = require('../lib/model/compendium');
 var Job = require('../lib/model/job');
 var Loader = require('../lib/loader').Loader;

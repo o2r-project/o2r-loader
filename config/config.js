@@ -124,4 +124,6 @@ c.bagtainer.metaextract.create_options = {
   NetworkMode: 'none'
 };
 
+c.webdav.url = 'https://uni-muenster.sciebo.de/public.php/webdav';
+
 module.exports = c;
