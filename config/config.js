@@ -19,6 +19,7 @@ c.version = {};
 c.net = {};
 c.mongo = {};
 c.fs = {};
+c.webdav = {};
 var env = process.env;
 
 // Information about muncher
