@@ -25,6 +25,7 @@ var Job = require('../lib/model/job');
 var Loader = require('../lib/loader').Loader;
 
 var url = require('url');
+var validator = require('validator');
 
 
 exports.create = (req, res) => {
@@ -39,8 +40,16 @@ exports.create = (req, res) => {
   }
 
   // validate share_url
-  var hostname = url.parse(req.body.share_url).hostname.split(".");
+  if(!validator.isURL(req.body.share_url)) {
+    res.status(403).send('Public share URL is invalid.');
+    debug('Invalid share_url:', req.body.share_url);
+    return;
+  }
+
+  let validURL = url.parse(req.body.share_url);
+  let hostname = validURL.hostname.split(".");
   hostname = hostname[hostname.length - 2];
+
 
   if (hostname !== 'sciebo') {
     res.status(403).send('Public share host is not allowed, only "sciebo" is supported.');
@@ -48,7 +57,11 @@ exports.create = (req, res) => {
     return;
   }
 
-  // validate path
+  // validate path (default '/')
+
+  if (req.body.path === undefined) {
+    req.body.path = '/';
+  }
 
   // validate content_type
   if (req.body.content_type === 'compendium_v1') {
@@ -64,4 +77,3 @@ exports.create = (req, res) => {
     debug('Provided content_type "%s" not implemented', req.body.content_type);
   } 
 };
-
