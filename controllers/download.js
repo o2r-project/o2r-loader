@@ -57,9 +57,9 @@ exports.create = (req, res) => {
     return;
   }
 
-  // validate path (default '/')
+  // path (default '/')
 
-  if (req.body.path === undefined) {
+  if (!req.body.path) {
     req.body.path = '/';
   }
 
