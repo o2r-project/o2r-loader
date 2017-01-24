@@ -1,13 +1,17 @@
 /* eslint-env mocha */
 const assert = require('chai').assert;
 const request = require('request');
+const config = require('../config/config');
 
-const host = 'http://localhost';
+const host = 'http://localhost:'  + config.net.port;
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
+const requestTimeout = 10000;
+
 
 describe('API basics', function () {
 
     var compendium_id = '';
+
     describe('create new compendium based on public WebDAV', () => {
         it('public share with bagit.txt: should respond with a compendium ID', (done) => {
             let form = {
@@ -83,7 +87,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'directory contains no files');
+                assert.propertyVal(JSON.parse(body), 'error', 'single directory found. Use the path parameter to point to the compendium directory');
                 done();
             });
         }).timeout(10000);
@@ -109,7 +113,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 403);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'workspace not implemented');
+                assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
                 done();
             });
         }).timeout(10000);
@@ -135,7 +139,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'invalid share URL');
+                assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
                 done();
             });
         }).timeout(10000);
@@ -161,7 +165,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'public share not found');
+                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
                 done();
             });
         }).timeout(10000);
@@ -187,7 +191,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'invalid webdav path');
+                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
                 done();
             });
         }).timeout(10000);

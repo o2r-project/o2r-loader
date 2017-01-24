@@ -41,8 +41,8 @@ exports.create = (req, res) => {
 
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
-    res.status(403).send('Public share URL is invalid.');
     debug('Invalid share_url:', req.body.share_url);
+    res.status(404).send('{"error":"public share URL is invalid"}');
     return;
   }
 
@@ -52,8 +52,8 @@ exports.create = (req, res) => {
 
 
   if (hostname !== 'sciebo') {
-    res.status(403).send('Public share host is not allowed, only "sciebo" is supported.');
     debug('Public share host "%s" is not allowed.', hostname);
+    res.status(403).send('{"error":"public share host is not allowed, only sciebo is supported"}');
     return;
   }
 
