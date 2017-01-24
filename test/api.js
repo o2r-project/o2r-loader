@@ -9,11 +9,10 @@ describe('API basics', function () {
 
     var compendium_id = '';
     describe('create new compendium based on public WebDAV', () => {
-        it('bagit.txt: should respond with a compendium ID', (done) => {
+        it('public share with bagit.txt: should respond with a compendium ID', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U',
-                path: '/sleeptainer',
-                content_type: 'compendium_v1',
+                content_type: 'compendium_v1'
             };
 
             let j = request.jar();
@@ -36,11 +35,11 @@ describe('API basics', function () {
             });
         }).timeout(10000);
 
-        it('zip file: should respond with a compendium ID', (done) => {
+        it('public share with zip file: should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO',
-                path: '/sleeptainer',
-                content_type: 'compendium_v1',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/9R3P3xDe9K4ClmG',
+                path: '/',
+                content_type: 'compendium_v1'
             };
 
             let j = request.jar();
@@ -63,10 +62,10 @@ describe('API basics', function () {
             });
         }).timeout(10000);
 
-        it('single directory: should throw an error and notify that the directory contains no files', (done) => {
+        it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/kg31BEkkwNgQWRi',
-                path: '/sleeptainer',
+                path: '/',
                 content_type: 'compendium_v1',
             };
 
@@ -89,10 +88,10 @@ describe('API basics', function () {
             });
         }).timeout(10000);
 
-        it('multiple directories / files: should throw an error (workspace not implemented) ', (done) => {
+        it('public share with multiple directories / files: should throw an error (workspace not implemented) ', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/tY6I8NrDxTeXG85',
-                path: '/sleeptainer',
+                path: '/',
                 content_type: 'compendium_v1',
             };
 
@@ -118,7 +117,7 @@ describe('API basics', function () {
         it('invalid share URL: should respond with an error 404', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO not valid',
-                path: '/sleeptainer',
+                path: '/',
                 content_type: 'compendium_v1',
             };
 
@@ -144,7 +143,7 @@ describe('API basics', function () {
         it('invalid token: should respond with an error 404', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
-                path: '/sleeptainer',
+                path: '/',
                 content_type: 'compendium_v1',
             };
 
