@@ -22,7 +22,7 @@ c.fs = {};
 c.webdav = {};
 var env = process.env;
 
-// Information about muncher
+// Information about loader
 c.version.major = 0;
 c.version.minor = 0;
 c.version.bug = 1;
@@ -113,17 +113,14 @@ c.bagtainer.docker.create_options = {
 c.bagtainer.docker.start_options = {
 };
 
+// metadata extraction and brokering options
 c.bagtainer.metaextract = {};
-c.bagtainer.metaextract.outputDir = '.o2r';
+c.bagtainer.metaextract.cliPath = env.MUNCHER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+c.bagtainer.metaextract.module = 'extract';
+c.bagtainer.metaextract.outputDir = '.erc';
 c.bagtainer.metaextract.targetElement = 'o2r';
-c.bagtainer.metaextract.bestCandidateFile = 'metadata.json';
+c.bagtainer.metaextract.bestCandidateFile = 'metadata_raw.json';
 c.bagtainer.metaextract.failOnNoMetadata = false;
-c.bagtainer.metaextract.image = 'o2rproject/o2r-meta-extract:latest';
-c.bagtainer.metaextract.start_options = {};
-c.bagtainer.metaextract.create_options = {
-  CpuShares: 512,
-  NetworkMode: 'none'
-};
 
 c.webdav.url = 'https://uni-muenster.sciebo.de/public.php/webdav';
 
