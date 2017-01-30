@@ -110,7 +110,7 @@ function initApp(callback) {
     /*
      * configure routes
      */
-    app.post('/api/v1/public-share', controllers.download.create);
+    app.post('/api/v1/compendium', controllers.download.create);
 
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');

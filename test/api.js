@@ -5,7 +5,7 @@ const config = require('../config/config');
 
 const host = 'http://localhost:'  + config.net.port;
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
-const requestTimeout = 10000;
+const requestLoadingTimeout = 10000;
 
 
 describe('API basics', function () {
@@ -28,7 +28,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
@@ -55,7 +55,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
@@ -82,7 +82,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
@@ -108,7 +108,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 403);
@@ -134,12 +134,38 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
+                done();
+            });
+        }).timeout(10000);
+
+        it('invalid host (not a sciebo public share): should respond with an error 404', (done) => {
+            let form = {
+                share_url: 'https://myowncloud.wxyz/index.php/s/7EoWgjLSFVV89AO',
+                path: '/',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v1/public-share',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 404);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.propertyVal(JSON.parse(body), 'error', 'public share host is not allowed, only sciebo is supported');
                 done();
             });
         }).timeout(10000);
@@ -160,7 +186,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
@@ -186,7 +212,7 @@ describe('API basics', function () {
                 method: 'POST',
                 jar: j,
                 form: form,
-                timeout: requestTimeout
+                timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);

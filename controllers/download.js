@@ -46,6 +46,7 @@ exports.create = (req, res) => {
     return;
   }
 
+  // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
   let validURL = url.parse(req.body.share_url);
   let hostname = validURL.hostname.split(".");
   hostname = hostname[hostname.length - 2];
@@ -57,9 +58,7 @@ exports.create = (req, res) => {
     return;
   }
 
-  // path (default '/')
-
-  if (!req.body.path) {
+  if (!req.body.path) { // set default value for path ('/')
     req.body.path = '/';
   }
 
