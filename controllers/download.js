@@ -68,8 +68,12 @@ exports.create = (req, res) => {
       req.body.content_type, req.user.id);
 
     var loader = new Loader(req, res);
-    loader.load((id) => {
-      debug('New compendium %s successfully loaded', id);
+    loader.load((id, err) => {
+      if (err) {
+        debug('Error during public share load: %s', JSON.stringify(err));
+      } else {
+        debug('New compendium %s successfully loaded', id);
+      }
     });
   } else {
     res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
