@@ -52,9 +52,10 @@ exports.create = (req, res) => {
   hostname = hostname[hostname.length - 2];
 
 
-  if (hostname !== 'sciebo') {
+  if (c.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
     debug('Public share host "%s" is not allowed.', hostname);
-    res.status(403).send('{"error":"public share host is not allowed, only sciebo is supported"}');
+    res.status(403).send('{"error":"public share host is not allowed"}');
+    debug('public share host is not allowed, supported is: %s', c.webdav.allowedHosts.toString());
     return;
   }
 

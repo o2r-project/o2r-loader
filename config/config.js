@@ -122,6 +122,8 @@ c.bagtainer.metaextract.targetElement = 'o2r';
 c.bagtainer.metaextract.bestCandidateFile = 'metadata_raw.json';
 c.bagtainer.metaextract.failOnNoMetadata = false;
 
+c.webdav.allowedHosts = ['sciebo'];
 c.webdav.url = 'https://uni-muenster.sciebo.de/public.php/webdav';
+//c.webdav.url = 'https://demo.nextcloud.com:34858/nextcloud/public.php/dav'; //nextcloud public webdav url
 
 module.exports = c;
