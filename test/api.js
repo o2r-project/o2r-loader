@@ -87,7 +87,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'single directory found. Use the path parameter to point to the compendium directory');
+                assert.propertyVal(JSON.parse(body), 'error', 'Single directory found. Use the "path" parameter to point to the compendium directory.');
                 done();
             });
         }).timeout(10000);

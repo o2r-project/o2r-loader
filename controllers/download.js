@@ -17,7 +17,7 @@
 
 // General modules
 var c = require('../config/config');
-var debug = require('debug')('compendium');
+var debug = require('debug')('loader');
 var fs = require('fs');
 
 var Compendium = require('../lib/model/compendium');
@@ -71,7 +71,7 @@ exports.create = (req, res) => {
     var loader = new Loader(req, res);
     loader.load((id, err) => {
       if (err) {
-        debug('Error during public share load: %s', JSON.stringify(err));
+        debug('Error during public share load: %s', err.message);
       } else {
         debug('New compendium %s successfully loaded', id);
       }
