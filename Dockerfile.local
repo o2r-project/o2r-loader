@@ -15,11 +15,12 @@
 FROM frolvlad/alpine-python3
 MAINTAINER o2r-project <https://o2r.info>
 
-RUN apk add --no-cache \
+RUN apk add --no-cache --update\
     git \
     wget \
     unzip \
     nodejs \
+    openssl \
     ca-certificates \
   && pip install --upgrade pip \
   && pip install bagit \
