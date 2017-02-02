@@ -51,7 +51,6 @@ exports.create = (req, res) => {
   let hostname = validURL.hostname.split(".");
   hostname = hostname[hostname.length - 2];
 
-
   if (c.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
     debug('Public share host "%s" is not allowed.', hostname);
     res.status(403).send('{"error":"public share host is not allowed"}');

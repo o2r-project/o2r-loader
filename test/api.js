@@ -37,7 +37,7 @@ describe('API basics', function () {
                 compendium_id = JSON.parse(body).id;
                 done();
             });
-        }).timeout(10000);
+        }).timeout(20000);
 
         it('public share with zip file: should respond with a compendium ID', (done) => {
             let form = {
@@ -64,7 +64,7 @@ describe('API basics', function () {
                 compendium_id = JSON.parse(body).id;
                 done();
             });
-        }).timeout(10000);
+        }).timeout(20000);
 
         it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
             let form = {
