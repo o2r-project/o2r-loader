@@ -2,9 +2,19 @@
 
 Node.js implementation to load compendia from third party repositories and resources via the [o2r web api](http://o2r.info/o2r-web-api).
 
+Currently, it implements the endpoint `/api/v2/compendium`.
+
 ## Requirements
 
-- Node.js (`>= 6.x`)
+Requirements:
+
+- Node.js `>= 6.2`
+- npm
+- Python `>= 3.x`
+- bagit-python (`bagit.py`)
+- o2r-meta (`o2rmeta.py`)
+- unzip
+- mongodb
 
 ## Configuration
 
@@ -21,18 +31,30 @@ The configuration can be done via environment variables.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 
-## Run locally
+## Development
+
+### Steps for manual local development
+
+```bash
+mkdir /tmp/o2r-mongodb-data
+mongod --dbpath /tmp/o2r-mongodb-data
+# new terminal: start bouncer (default port 8081)
+cd ../o2r-bouncer
+DEBUG=* OAUTH_CLIENT_ID=<...> OAUTH_CLIENT_SECRET=<...> npm start
+```
+
+Then start the loader in your IDE or in a new terminal.
+
+## Testing
+
+Tests found in the file `api.js` can be started using mocha:
 
 ```bash
 npm install
-npm start
+npm install -g mocha
+mocha
 ```
-
-TBD
-
-## Test
-
-TBD
+For this, the loader has to run locally or as part of a docker-compose configuration.
 
 ## Dockerfile
 
