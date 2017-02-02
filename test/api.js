@@ -24,7 +24,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -51,7 +51,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -78,7 +78,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -104,7 +104,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -130,7 +130,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -156,7 +156,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -182,7 +182,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -208,7 +208,7 @@ describe('API basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: host + '/api/v2/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
