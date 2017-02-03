@@ -22,7 +22,9 @@ const backoff = require('backoff');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
-fse.mkdirsSync(config.fs.tmp);
+fse.mkdirsSync(config.fs.base);
+fse.mkdirsSync(config.fs.incoming);
+fse.mkdirsSync(config.fs.compendium);
 
 const dbURI = config.mongo.location + config.mongo.database;
 mongoose.connect(dbURI);
@@ -32,14 +34,19 @@ mongoose.connection.on('error', (err) => {
 
 // Express modules and tools
 const express = require('express');
+const compression = require('compression');
 const app = express();
-const responseTime = require('response-time')
+const responseTime = require('response-time');
+const bodyParser = require('body-parser');
 
 app.use((req, res, next) => {
   debug(req.method + ' ' + req.path);
   next();
 });
 app.use(responseTime());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 
 const url = require('url');
 
@@ -103,7 +110,7 @@ function initApp(callback) {
     /*
      * configure routes
      */
-    app.get('/api/v1/...', controllers...);
+    app.post('/api/v2/compendium', controllers.download.create);
 
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');
