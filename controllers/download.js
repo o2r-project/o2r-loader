@@ -21,7 +21,6 @@ var debug = require('debug')('loader');
 var fs = require('fs');
 
 var Compendium = require('../lib/model/compendium');
-var Job = require('../lib/model/job');
 var Loader = require('../lib/loader').Loader;
 
 var url = require('url');
