@@ -38,6 +38,11 @@ exports.create = (req, res) => {
     return;
   }
 
+  // check for ZENODO url -> start zenodo loader
+  if(req.body.zenodo_url !== null){
+    //start zenodo loader
+  }
+
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
     debug('Invalid share_url:', req.body.share_url);
