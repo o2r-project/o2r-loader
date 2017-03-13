@@ -41,6 +41,53 @@ exports.create = (req, res) => {
   // check for ZENODO url -> start zenodo loader
   if(req.body.zenodo_url !== null){
     //start zenodo loader
+
+    // validate zenodo_url
+    if(!validator.isURL(req.body.zenodo_url)) {
+      debug('Invalid zenodo_url:', req.body.zenodo_url);
+      res.status(404).send('{"error":"zenodo URL is invalid"}');
+      return;
+    }
+
+    if (!req.body.filename) { // validate filename parameter exists
+      debug('Filename missing');
+      res.status(404).send('{"error":"filename is missing"}');
+      return;
+    }
+
+    // get zenodo record ID from Zenodo URL
+    // e.g. https://sandbox.zenodo.org/record/59917
+    // todo: accept DOI, zenodo record id as well -> parser
+    let parsedURL = url.parse(req.body.zenodo_url);
+    let zenodoPaths = parsedURL.path.split('/');
+    let zenodoID = zenodoPaths[zenodoPaths.length - 1];
+    req.body.zenodo_id = zenodoID;
+
+    // validate zenodoID
+    if (!validator.isNumeric(zenodoID)){
+      debug('Invalid zenodoID:', zenodoID);
+      res.status(404).send('{"error":"zenodo ID is not a number"}');
+      return;
+    }
+
+    // validate content_type
+    if (req.body.content_type === 'compendium_v1') {
+      debug('Creating new %s for user %s)',
+        req.body.content_type, req.user.id);
+
+      var loader = new Loader(req, res);
+      loader.load((id, err) => {
+        if (err) {
+          debug('Error during public share load: %s', err.message);
+        } else {
+          debug('New compendium %s successfully loaded', id);
+        }
+      });
+    } else {
+      res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
+      debug('Provided content_type "%s" not implemented', req.body.content_type);
+    } 
+
   }
 
   // validate share_url
@@ -52,7 +99,7 @@ exports.create = (req, res) => {
 
   // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
   let validURL = url.parse(req.body.share_url);
-  let hostname = validURL.hostname.split(".");
+  let hostname = validURL.hostname.split('.');
   hostname = hostname[hostname.length - 2];
 
   if (c.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
