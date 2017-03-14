@@ -73,7 +73,7 @@ exports.create = (req, res) => {
         break;
       default:
         debug('Invalid hostname:', parsedURL.host);
-        res.status(404).send('{"error":"hostname must be zenodo or sandbox.zenodo"}');
+        res.status(403).send('{"error":"host is not allowed"}');
         return;
     }
 
