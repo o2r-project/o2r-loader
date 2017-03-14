@@ -20,6 +20,7 @@ c.net = {};
 c.mongo = {};
 c.fs = {};
 c.webdav = {};
+c.zenodo = {};
 var env = process.env;
 
 // Information about loader
@@ -125,5 +126,9 @@ c.bagtainer.metaextract.failOnNoMetadata = false;
 c.webdav.allowedHosts = ['sciebo'];
 c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
 //c.webdav.urlString = 'nextcloud/public.php/dav'; //nextcloud public webdav url
+
+//allowed hosts for zenodo load
+c.zenodo.url = 'https://zenodo.org/';
+c.zenodo.sandbox_url = 'https://sandbox.zenodo.org/';
 
 module.exports = c;
