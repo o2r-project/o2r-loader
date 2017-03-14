@@ -38,8 +38,10 @@ exports.create = (req, res) => {
     return;
   }
 
+  //TODO here: write function for webdav and zenodo + cleanup
+
   // check for ZENODO url -> start zenodo loader
-  if(req.body.zenodo_url !== null){
+  if(req.body.zenodo_url !== undefined){
     //start zenodo loader
 
     // validate zenodo_url
