@@ -63,8 +63,22 @@ exports.create = (req, res) => {
     let zenodoID = zenodoPaths[zenodoPaths.length - 1];
     req.body.zenodo_id = zenodoID;
 
+    //validate host (must be zenodo or sandbox.zenodo)
+    switch (parsedURL.host) {
+      case 'sandbox.zenodo.org':
+        req.body.base_url = c.zenodo.sandbox_url;
+        break;
+      case 'zenodo.org':
+        req.body.base_url = c.zenodo.url;
+        break;
+      default:
+        debug('Invalid hostname:', parsedURL.host);
+        res.status(404).send('{"error":"hostname must be zenodo or sandbox.zenodo"}');
+        return;
+    }
+
     // validate zenodoID
-    if (!validator.isNumeric(zenodoID)){
+    if (!validator.isNumeric(String(zenodoID))){
       debug('Invalid zenodoID:', zenodoID);
       res.status(404).send('{"error":"zenodo ID is not a number"}');
       return;
@@ -76,7 +90,7 @@ exports.create = (req, res) => {
         req.body.content_type, req.user.id);
 
       var loader = new Loader(req, res);
-      loader.load((id, err) => {
+      loader.loadZenodo((id, err) => {
         if (err) {
           debug('Error during public share load: %s', err.message);
         } else {
@@ -87,7 +101,7 @@ exports.create = (req, res) => {
       res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
       debug('Provided content_type "%s" not implemented', req.body.content_type);
     } 
-
+    return;
   }
 
   // validate share_url
