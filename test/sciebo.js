@@ -68,7 +68,7 @@ describe('API basics', function () {
 
         it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/kg31BEkkwNgQWRi',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/pnKnjIjas9bZgbB',
                 path: '/',
                 content_type: 'compendium_v1',
             };
