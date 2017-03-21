@@ -165,7 +165,7 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 403);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'public share host is not allowed');
+                assert.propertyVal(JSON.parse(body), 'error', 'host is not allowed');
                 done();
             });
         }).timeout(10000);

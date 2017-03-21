@@ -15,7 +15,7 @@ describe('API basics', function () {
     describe('create new compendium based on a zenodo record', () => {
         it('zenodo record with zip file: should respond with a compendium ID', (done) => {
             let form = {
-                zenodo_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/69114',
                 filename: 'metatainer.zip',
                 content_type: 'compendium_v1'
             };
@@ -42,7 +42,7 @@ describe('API basics', function () {
 
         it('invalid zenodo URL: should respond with an error 404', (done) => {
             let form = {
-                zenodo_url: 'htts://sandbox.zenodo.org/record/69114',
+                share_url: 'htts://sandbox.zenodo.org/record/69114',
                 filename: 'metatainer.zip',
                 content_type: 'compendium_v1',
             };
@@ -68,7 +68,7 @@ describe('API basics', function () {
 
         it('invalid host (not a zenodo record): should respond with an error 403', (done) => {
             let form = {
-                zenodo_url: 'https://sandbox.ODONEZ.org/record/69114',
+                share_url: 'https://sandbox.ODONEZ.org/record/69114',
                 filename: 'metatainer.zip',
                 content_type: 'compendium_v1',
             };
@@ -94,7 +94,7 @@ describe('API basics', function () {
 
         it('filename not found: should respond with an error 500', (done) => {
             let form = {
-                zenodo_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/69114',
                 filename: 'not_existing_file.xyz',
                 content_type: 'compendium_v1',
             };

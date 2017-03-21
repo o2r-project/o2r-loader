@@ -38,79 +38,48 @@ exports.create = (req, res) => {
     return;
   }
 
-  //TODO here: write function for webdav and zenodo + cleanup
-
-  // check for ZENODO url -> start zenodo loader
-  if(req.body.zenodo_url !== undefined){
-    //start zenodo loader
-
-    // validate zenodo_url
-    if(!validator.isURL(req.body.zenodo_url)) {
-      debug('Invalid zenodo_url:', req.body.zenodo_url);
-      res.status(404).send('{"error":"zenodo URL is invalid"}');
-      return;
-    }
-
-    if (!req.body.filename) { // validate filename parameter exists
-      debug('Filename missing');
-      res.status(404).send('{"error":"filename is missing"}');
-      return;
-    }
-
-    // get zenodo record ID from Zenodo URL
-    // e.g. https://sandbox.zenodo.org/record/59917
-    // todo: accept DOI, zenodo record id as well -> parser
-    let parsedURL = url.parse(req.body.zenodo_url);
-    let zenodoPaths = parsedURL.path.split('/');
-    let zenodoID = zenodoPaths[zenodoPaths.length - 1];
-    req.body.zenodo_id = zenodoID;
-
-    //validate host (must be zenodo or sandbox.zenodo)
-    switch (parsedURL.host) {
-      case 'sandbox.zenodo.org':
-        req.body.base_url = c.zenodo.sandbox_url;
-        break;
-      case 'zenodo.org':
-        req.body.base_url = c.zenodo.url;
-        break;
-      default:
-        debug('Invalid hostname:', parsedURL.host);
-        res.status(403).send('{"error":"host is not allowed"}');
-        return;
-    }
-
-    // validate zenodoID
-    if (!validator.isNumeric(String(zenodoID))){
-      debug('Invalid zenodoID:', zenodoID);
-      res.status(404).send('{"error":"zenodo ID is not a number"}');
-      return;
-    }
-
-    // validate content_type
-    if (req.body.content_type === 'compendium_v1') {
-      debug('Creating new %s for user %s)',
-        req.body.content_type, req.user.id);
-
-      var loader = new Loader(req, res);
-      loader.loadZenodo((id, err) => {
-        if (err) {
-          debug('Error during public share load: %s', err.message);
-        } else {
-          debug('New compendium %s successfully loaded', id);
-        }
-      });
-    } else {
-      res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
-      debug('Provided content_type "%s" not implemented', req.body.content_type);
-    } 
-    return;
+  // validate content_type
+  if (req.body.content_type !== 'compendium_v1') {
+    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
+    debug('Provided content_type "%s" not implemented', req.body.content_type);
   }
 
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
+    // todo: invalid URL; check for DOI, zenodo DOI or zenodo record ID here and possibly start zenodo loader
     debug('Invalid share_url:', req.body.share_url);
     res.status(404).send('{"error":"public share URL is invalid"}');
     return;
+  }
+
+  // get top-level hostname from share_url
+  let parsedURL = url.parse(req.body.share_url);
+  let hostname = validURL.hostname.split('.');
+  hostname = hostname[hostname.length - 2];
+  req.hostname = hostname;
+
+  //depending on the host, start zenodo loader or sciebo/owncloud loader
+  switch(hostname) {
+    case 'sciebo':
+      prepareScieboLoad(req, res);
+      break;
+    case 'zenodo':
+      prepareZenodoLoad(req, res);
+      break;
+    default:
+      debug('Public share host "%s" is not allowed.', hostname);
+      res.status(403).send('{"error":"host is not allowed"}');
+      debug('public share host is not allowed, supported is: %s', c.webdav.allowedHosts.toString());
+      return;
+  } 
+};
+
+function prepareScieboLoad(req, res) {
+  this.req = req;
+  this.res = res;
+
+  if (!req.body.path) { // set default value for path ('/')
+    req.body.path = '/';
   }
 
   // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
@@ -125,25 +94,54 @@ exports.create = (req, res) => {
     return;
   }
 
-  if (!req.body.path) { // set default value for path ('/')
-    req.body.path = '/';
+  var loader = new Loader(req, res);
+  loader.load((id, err) => {
+    if (err) {
+      debug('Error during public share load: %s', err.message);
+    } else {
+      debug('New compendium %s successfully loaded', id);
+    }
+  });
+}
+
+function prepareZenodoLoad(req, res) {
+  this.req = req;
+  this.res = res;
+
+  // get zenodo record ID from Zenodo URL
+  // e.g. https://sandbox.zenodo.org/record/59917
+  let parsedURL = url.parse(req.body.share_url);
+  let zenodoPaths = parsedURL.path.split('/');
+  let zenodoID = zenodoPaths[zenodoPaths.length - 1];
+  req.body.zenodo_id = zenodoID;
+
+  //validate host (must be zenodo or sandbox.zenodo)
+  switch (parsedURL.host) {
+    case 'sandbox.zenodo.org':
+      req.body.base_url = c.zenodo.sandbox_url;
+      break;
+    case 'zenodo.org':
+      req.body.base_url = c.zenodo.url;
+      break;
+    default:
+      debug('Invalid hostname:', parsedURL.host);
+      res.status(403).send('{"error":"host is not allowed"}');
+      return;
   }
 
-  // validate content_type
-  if (req.body.content_type === 'compendium_v1') {
-    debug('Creating new %s for user %s)',
-      req.body.content_type, req.user.id);
+  // validate zenodoID
+  if (!validator.isNumeric(String(zenodoID))){
+    debug('Invalid zenodoID:', zenodoID);
+    res.status(404).send('{"error":"zenodo ID is not a number"}');
+    return;
+  }
 
-    var loader = new Loader(req, res);
-    loader.load((id, err) => {
-      if (err) {
-        debug('Error during public share load: %s', err.message);
-      } else {
-        debug('New compendium %s successfully loaded', id);
-      }
-    });
-  } else {
-    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
-    debug('Provided content_type "%s" not implemented', req.body.content_type);
-  } 
-};
+  var loader = new Loader(req, res);
+  loader.loadZenodo((id, err) => {
+    if (err) {
+      debug('Error during zenodo load: %s', err.message);
+    } else {
+      debug('New compendium %s successfully loaded', id);
+    }
+  });
+}
