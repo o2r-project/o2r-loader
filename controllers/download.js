@@ -28,6 +28,7 @@ var validator = require('validator');
 
 
 exports.create = (req, res) => {
+  req.params = {};
   // check user level
   if (!req.isAuthenticated()) {
     res.status(401).send('{"error":"user is not authenticated"}');
@@ -54,7 +55,8 @@ exports.create = (req, res) => {
       res.status(404).send('{"error":"public share URL is invalid"}');
       return;
     } else { // otherwise start zenodo loader with zenodoID
-      req.zenodoID = tempZenodoID;
+      req.params.zenodo_id = tempZenodoID;
+      req.params.zenodoHost = 
       prepareZenodoLoad(req, res);
       return;
     }
@@ -75,13 +77,13 @@ exports.create = (req, res) => {
       // get zenodo record ID from Zenodo URL, e.g. https://sandbox.zenodo.org/record/59917
       let zenodoPaths = parsedURL.path.split('/');
       let zenodoID = zenodoPaths[zenodoPaths.length - 1];
-      req.body.zenodoHost = parsedURL.host;
-      req.body.zenodo_id = zenodoID;
+      req.params.zenodoHost = parsedURL.host;
+      req.params.zenodo_id = zenodoID;
       prepareZenodoLoad(req, res);
       break;
     case 'doi':
       // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
-      req.body.zenodo_id = parsedURL.path.split('zenodo.')[1];
+      req.params.zenodo_id = parsedURL.path.split('zenodo.')[1];
       prepareZenodoLoad(req, res);
       break;
     default:
@@ -127,22 +129,22 @@ function prepareZenodoLoad(req, res) {
   this.res = res;
 
   //validate host (must be zenodo or sandbox.zenodo)
-  switch (req.body.zenodoHost) {
+  switch (req.params.zenodoHost) {
     case 'sandbox.zenodo.org':
-      req.body.base_url = c.zenodo.sandbox_url;
+      req.params.base_url = c.zenodo.sandbox_url;
       break;
     case 'zenodo.org':
-      req.body.base_url = c.zenodo.url;
+      req.params.base_url = c.zenodo.url;
       break;
     default:
-      debug('Invalid hostname:', req.body.zenodoHost);
+      debug('Invalid hostname:', req.params.zenodoHost);
       res.status(403).send('{"error":"host is not allowed"}');
       return;
   }
 
   // validate zenodoID
-  if (!validator.isNumeric(String(req.zenodoID))){
-    debug('Invalid zenodoID:', req.zenodoID);
+  if (!validator.isNumeric(String(req.params.zenodo_id))){
+    debug('Invalid zenodoID:', req.params.zenodo_id);
     res.status(404).send('{"error":"zenodo ID is not a number"}');
     return;
   }
@@ -158,7 +160,6 @@ function prepareZenodoLoad(req, res) {
 }
 
 function getZenodoID(str) {
-  let id;
   if (!isNaN(str)) {
     return str;
   }
@@ -167,6 +168,7 @@ function getZenodoID(str) {
   let doiRegex = new RegExp(/^\d+\.\d+\/zenodo\.\d+$/);
   if (doiRegex.test(str)) { //return the zenodoID from the DOI
     return str.split('zenodo.')[1];
+  } else {
+    return false;
   }
-  return id;
 }
