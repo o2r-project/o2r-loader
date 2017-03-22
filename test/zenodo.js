@@ -117,6 +117,8 @@ describe('API basics', function () {
                 done();
             });
         }).timeout(10000);
+
+        //todo add tests for DOI, recordID, DOI URL
     });  
 });
 

@@ -42,14 +42,22 @@ exports.create = (req, res) => {
   if (req.body.content_type !== 'compendium_v1') {
     res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
     debug('Provided content_type "%s" not implemented', req.body.content_type);
+    return;
   }
 
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
-    // todo: invalid URL; check for DOI, zenodo DOI or zenodo record ID here and possibly start zenodo loader
-    debug('Invalid share_url:', req.body.share_url);
-    res.status(404).send('{"error":"public share URL is invalid"}');
-    return;
+    let tempZenodoID = getZenodoID(req.share_url);
+
+    if (!tempZenodoID) { //throw an error if zenodo ID could not be extracted
+      debug('Invalid share_url:', req.body.share_url);
+      res.status(404).send('{"error":"public share URL is invalid"}');
+      return;
+    } else { // otherwise start zenodo loader with zenodoID
+      req.zenodoID = tempZenodoID;
+      prepareZenodoLoad(req, res);
+      return;
+    }
   }
 
   // get top-level hostname from share_url
@@ -64,6 +72,16 @@ exports.create = (req, res) => {
       prepareScieboLoad(req, res);
       break;
     case 'zenodo':
+      // get zenodo record ID from Zenodo URL, e.g. https://sandbox.zenodo.org/record/59917
+      let zenodoPaths = parsedURL.path.split('/');
+      let zenodoID = zenodoPaths[zenodoPaths.length - 1];
+      req.body.zenodoHost = parsedURL.host;
+      req.body.zenodo_id = zenodoID;
+      prepareZenodoLoad(req, res);
+      break;
+    case 'doi':
+      // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
+      req.body.zenodo_id = parsedURL.path.split('zenodo.')[1];
       prepareZenodoLoad(req, res);
       break;
     default:
@@ -108,15 +126,8 @@ function prepareZenodoLoad(req, res) {
   this.req = req;
   this.res = res;
 
-  // get zenodo record ID from Zenodo URL
-  // e.g. https://sandbox.zenodo.org/record/59917
-  let parsedURL = url.parse(req.body.share_url);
-  let zenodoPaths = parsedURL.path.split('/');
-  let zenodoID = zenodoPaths[zenodoPaths.length - 1];
-  req.body.zenodo_id = zenodoID;
-
   //validate host (must be zenodo or sandbox.zenodo)
-  switch (parsedURL.host) {
+  switch (req.body.zenodoHost) {
     case 'sandbox.zenodo.org':
       req.body.base_url = c.zenodo.sandbox_url;
       break;
@@ -124,14 +135,14 @@ function prepareZenodoLoad(req, res) {
       req.body.base_url = c.zenodo.url;
       break;
     default:
-      debug('Invalid hostname:', parsedURL.host);
+      debug('Invalid hostname:', req.body.zenodoHost);
       res.status(403).send('{"error":"host is not allowed"}');
       return;
   }
 
   // validate zenodoID
-  if (!validator.isNumeric(String(zenodoID))){
-    debug('Invalid zenodoID:', zenodoID);
+  if (!validator.isNumeric(String(req.zenodoID))){
+    debug('Invalid zenodoID:', req.zenodoID);
     res.status(404).send('{"error":"zenodo ID is not a number"}');
     return;
   }
@@ -144,4 +155,18 @@ function prepareZenodoLoad(req, res) {
       debug('New compendium %s successfully loaded', id);
     }
   });
+}
+
+function getZenodoID(str) {
+  let id;
+  if (!isNaN(str)) {
+    return str;
+  }
+
+  //regex for a DOI (e.g. "10.5281/zenodo.268443")
+  let doiRegex = new RegExp(/^\d+\.\d+\/zenodo\.\d+$/);
+  if (doiRegex.test(str)) { //return the zenodoID from the DOI
+    return str.split('zenodo.')[1];
+  }
+  return id;
 }
