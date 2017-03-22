@@ -54,7 +54,7 @@ exports.create = (req, res) => {
 
   // get top-level hostname from share_url
   let parsedURL = url.parse(req.body.share_url);
-  let hostname = validURL.hostname.split('.');
+  let hostname = parsedURL.hostname.split('.');
   hostname = hostname[hostname.length - 2];
   req.hostname = hostname;
 
