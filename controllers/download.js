@@ -115,7 +115,7 @@ function prepareScieboLoad(req, res) {
   }
 
   var loader = new Loader(req, res);
-  loader.load((id, err) => {
+  loader.loadOwncloud((id, err) => {
     if (err) {
       debug('Error during public share load: %s', err.message);
     } else {
