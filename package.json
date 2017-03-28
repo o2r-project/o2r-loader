@@ -41,7 +41,8 @@
     "request": "^2.79.0",
     "response-time": "^2.3.2",
     "validator": "^6.2.1",
-    "webdav": "^0.1.1"
+    "webdav": "^0.1.1",
+    "html-metadata": "^1.6.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
