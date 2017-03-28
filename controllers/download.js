@@ -47,7 +47,7 @@ exports.create = (req, res) => {
   }
 
   // if the DOI parameter exists, extract the zenodo record ID from it
-  if (typeof req.body.doi !== undefined) {
+  if (typeof req.body.doi !== 'undefined') {
     //regex for a DOI (e.g. "10.5281/zenodo.268443")
     let doiRegex = new RegExp(/^\d+\.\d+\/zenodo\.\d+$/);
 
@@ -59,20 +59,20 @@ exports.create = (req, res) => {
       return;
     }
 
-    req.params.zenodoHost = 'zenodo.org';
+    req.params.zenodoHost = c.zenodo.fallback_host;
     prepareZenodoLoad(req, res);
     return;
   }
 
   // if the zenodo_record_id parameter exists, start the zenodo loader with it
-  if (typeof req.body.zenodo_record_id !== undefined) {
+  if (typeof req.body.zenodo_record_id !== 'undefined') {
     if (isNaN(req.body.zenodo_record_id)) {
       debug('Invalid zenodo_record_id:', req.body.zenodo_record_id);
-      res.status(404).send('{"error":"public share URL is invalid"}');
+      res.status(404).send('{"error":"zenodo_record_id is invalid"}');
       return;
     }
     req.params.zenodoID = req.body.zenodo_record_id;
-    req.params.zenodoHost = 'zenodo.org';
+    req.params.zenodoHost = c.zenodo.fallback_host;
     prepareZenodoLoad(req, res);
     return;
   }
@@ -105,6 +105,7 @@ exports.create = (req, res) => {
     case 'doi':
       // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
       req.params.zenodoID = parsedURL.path.split('zenodo.')[1];
+      req.params.zenodoHost = c.zenodo.fallback_host;
       prepareZenodoLoad(req, res);
       break;
     default:
@@ -154,7 +155,7 @@ function prepareZenodoLoad(req, res) {
     case 'sandbox.zenodo.org':
       req.params.baseURL = c.zenodo.sandbox_url;
       break;
-    case 'zenodo.org':
+    case c.zenodo.fallback_host:
       req.params.baseURL = c.zenodo.url;
       break;
     default:

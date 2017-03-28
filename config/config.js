@@ -130,6 +130,7 @@ c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
 //zenodo configuration
 c.zenodo.url = 'https://zenodo.org/';
 c.zenodo.sandbox_url = 'https://sandbox.zenodo.org/';
+c.zenodo.fallback_host = 'sandbox.zenodo.org';
 c.zenodo.token = env.ZENODO_TOKEN;
 
 module.exports = c;
