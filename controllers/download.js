@@ -59,7 +59,7 @@ exports.create = (req, res) => {
       return;
     }
 
-    req.params.zenodoHost = c.zenodo.fallback_host;
+    req.params.zenodoHost = c.zenodo.host;
     prepareZenodoLoad(req, res);
     return;
   }
@@ -72,7 +72,7 @@ exports.create = (req, res) => {
       return;
     }
     req.params.zenodoID = req.body.zenodo_record_id;
-    req.params.zenodoHost = c.zenodo.fallback_host;
+    req.params.zenodoHost = c.zenodo.host;
     prepareZenodoLoad(req, res);
     return;
   }
@@ -98,14 +98,12 @@ exports.create = (req, res) => {
       // get zenodo record ID from Zenodo URL, e.g. https://sandbox.zenodo.org/record/59917
       let zenodoPaths = parsedURL.path.split('/');
       let zenodoID = zenodoPaths[zenodoPaths.length - 1];
-      req.params.zenodoHost = parsedURL.host;
       req.params.zenodoID = zenodoID;
       prepareZenodoLoad(req, res);
       break;
     case 'doi':
       // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
       req.params.zenodoID = parsedURL.path.split('zenodo.')[1];
-      req.params.zenodoHost = c.zenodo.fallback_host;
       prepareZenodoLoad(req, res);
       break;
     default:
@@ -149,20 +147,6 @@ function prepareScieboLoad(req, res) {
 function prepareZenodoLoad(req, res) {
   this.req = req;
   this.res = res;
-
-  //validate host (must be zenodo or sandbox.zenodo)
-  switch (req.params.zenodoHost) {
-    case 'sandbox.zenodo.org':
-      req.params.baseURL = c.zenodo.sandbox_url;
-      break;
-    case c.zenodo.fallback_host:
-      req.params.baseURL = c.zenodo.url;
-      break;
-    default:
-      debug('Invalid hostname:', req.params.zenodoHost);
-      res.status(403).send('{"error":"host is not allowed"}');
-      return;
-  }
 
   // validate zenodoID
   if (!validator.isNumeric(String(req.params.zenodoID))){
