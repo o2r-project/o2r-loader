@@ -111,14 +111,14 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 403);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
                 done();
             });
         }).timeout(10000);
 
-        it('invalid share URL: should respond with an error 404', (done) => {
+        it('invalid share URL: should respond with an error 422', (done) => {
             let form = {
                 share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
                 path: '/',
@@ -137,7 +137,7 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 422);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
                 done();

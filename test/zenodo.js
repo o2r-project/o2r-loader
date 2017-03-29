@@ -37,7 +37,7 @@ describe('API basics', function () {
                 compendium_id = JSON.parse(body).id;
                 done();
             });
-        }).timeout(20000);
+        }).timeout(30000);
 
         it('zenodo record, additional "filename" parameter: should respond with a compendium ID', (done) => {
             let form = {
@@ -225,6 +225,31 @@ describe('API basics', function () {
         it('invalid zenodo_record_id (not a zenodo record): should respond with an error 422', (done) => {
             let form = {
                 zenodo_record_id: 'eigthhundredseventytwo',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v2/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 422);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.propertyVal(JSON.parse(body), 'error', 'zenodo_record_id is invalid');
+                done();
+            });
+        }).timeout(10000);
+
+        it('invalid zenodoID in share_url: should respond with an error 422', (done) => {
+            let form = {
+                share_url: 'https://sandbox.zenodo.org/record/asdfasdf',
                 content_type: 'compendium_v1',
             };
 
