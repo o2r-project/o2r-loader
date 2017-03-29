@@ -111,7 +111,7 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 403);
+                assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
                 done();

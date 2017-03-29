@@ -55,7 +55,7 @@ exports.create = (req, res) => {
       req.params.zenodoID = req.body.doi.split('zenodo.')[1];
     } else {
       debug('Invalid doi:', req.body.doi);
-      res.status(404).send('{"error":"DOI is invalid"}');
+      res.status(422).send('{"error":"DOI is invalid"}');
       return;
     }
 
@@ -68,7 +68,7 @@ exports.create = (req, res) => {
   if (typeof req.body.zenodo_record_id !== 'undefined') {
     if (isNaN(req.body.zenodo_record_id)) {
       debug('Invalid zenodo_record_id:', req.body.zenodo_record_id);
-      res.status(404).send('{"error":"zenodo_record_id is invalid"}');
+      res.status(422).send('{"error":"zenodo_record_id is invalid"}');
       return;
     }
     req.params.zenodoID = req.body.zenodo_record_id;
@@ -80,7 +80,7 @@ exports.create = (req, res) => {
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
       debug('Invalid share_url:', req.body.share_url);
-      res.status(404).send('{"error":"public share URL is invalid"}');
+      res.status(422).send('{"error":"public share URL is invalid"}');
       return;
   }
 
@@ -151,7 +151,7 @@ function prepareZenodoLoad(req, res) {
   // validate zenodoID
   if (!validator.isNumeric(String(req.params.zenodoID))){
     debug('Invalid zenodoID:', req.params.zenodoID);
-    res.status(404).send('{"error":"zenodo ID is not a number"}');
+    res.status(422).send('{"error":"zenodo ID is not a number"}');
     return;
   }
 
