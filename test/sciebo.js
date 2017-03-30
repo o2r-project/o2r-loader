@@ -8,7 +8,7 @@ const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2
 const requestLoadingTimeout = 20000;
 
 
-describe('API basics', function () {
+describe('Sciebo loader basics', function () {
 
     var compendium_id = '';
 

@@ -128,8 +128,12 @@ c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
 //c.webdav.urlString = 'nextcloud/public.php/dav'; //nextcloud public webdav url
 
 //zenodo configuration
-c.zenodo.url = 'https://sandbox.zenodo.org/';
-c.zenodo.host = 'sandbox.zenodo.org';
-c.zenodo.token = env.ZENODO_TOKEN;
+// default URL and host that is used to download files if the URL itself is not specified in the request (e.g. via DOI or zenodo_record_id parameter)
+c.zenodo.default_url = 'https://sandbox.zenodo.org/';
+c.zenodo.default_host = 'sandbox.zenodo.org';
+
+//base urls for zenodo and zenodo sandbox
+c.zenodo.zenodo_sandbox_url = 'https://sandbox.zenodo.org/';
+c.zenodo.zenodo_url = 'https://zenodo.org/';
 
 module.exports = c;
