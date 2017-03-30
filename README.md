@@ -4,6 +4,11 @@ Node.js implementation to load compendia from third party repositories and resou
 
 Currently, it implements the endpoint `/api/v2/compendium`.
 
+## Supported repositories
+
+- Sciebo (https://sciebo.de)
+- Zenodo or Zenodo Sandbox (https://zenodo.org or https://sandbox.zenodo.org)
+
 ## Requirements
 
 Requirements:
