@@ -8,14 +8,41 @@ const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2
 const requestLoadingTimeout = 20000;
 
 
-describe('API basics', function () {
+describe('Zenodo loader basics', function () {
 
     var compendium_id = '';
 
-    describe('create new compendium based on public WebDAV', () => {
-        it('public share with bagit.txt: should respond with a compendium ID', (done) => {
+    describe('create new compendium based on a zenodo record', () => {
+        it('zenodo record: should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U',
+                share_url: 'https://sandbox.zenodo.org/record/69114',
+                content_type: 'compendium_v1'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v2/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                compendium_id = JSON.parse(body).id;
+                done();
+            });
+        }).timeout(30000);
+
+        it('zenodo record, additional "filename" parameter: should respond with a compendium ID', (done) => {
+            let form = {
+                share_url: 'https://sandbox.zenodo.org/record/69114',
+                filename: 'metatainer.zip',
                 content_type: 'compendium_v1'
             };
 
@@ -39,10 +66,9 @@ describe('API basics', function () {
             });
         }).timeout(20000);
 
-        it('public share with zip file: should respond with a compendium ID', (done) => {
+        it('zenodo record, "doi" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/9R3P3xDe9K4ClmG',
-                path: '/',
+                doi: '10.5072/zenodo.69114',
                 content_type: 'compendium_v1'
             };
 
@@ -66,11 +92,11 @@ describe('API basics', function () {
             });
         }).timeout(20000);
 
-        it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
+        it('zenodo record, "doi.org" as "share_url": should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/kg31BEkkwNgQWRi',
-                path: '/',
-                content_type: 'compendium_v1',
+                share_url: 'http://doi.org/10.5072/zenodo.69114',
+                filename: 'metatainer.zip',
+                content_type: 'compendium_v1'
             };
 
             let j = request.jar();
@@ -85,18 +111,18 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'Single directory found. Use the "path" parameter to point to the compendium directory.');
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                compendium_id = JSON.parse(body).id;
                 done();
             });
-        }).timeout(10000);
+        }).timeout(20000);
 
-        it('public share with multiple directories / files: should throw an error (workspace not implemented) ', (done) => {
+        it('zenodo record, "zenodo_record_id" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/tY6I8NrDxTeXG85',
-                path: '/',
-                content_type: 'compendium_v1',
+                zenodo_record_id: '69114',
+                content_type: 'compendium_v1'
             };
 
             let j = request.jar();
@@ -111,17 +137,18 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 403);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                compendium_id = JSON.parse(body).id;
                 done();
             });
-        }).timeout(10000);
+        }).timeout(20000);
 
-        it('invalid share URL: should respond with an error 404', (done) => {
+        it('invalid zenodo URL: should respond with an error 422', (done) => {
             let form = {
-                share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
-                path: '/',
+                share_url: 'htts?///sandbox.zenodo.org/record/69114',
+                filename: 'metatainer.zip',
                 content_type: 'compendium_v1',
             };
 
@@ -137,17 +164,17 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 422);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
                 done();
             });
         }).timeout(10000);
 
-        it('invalid host (not a sciebo public share): should respond with an error 403', (done) => {
+        it('host not allowed (not a zenodo record): should respond with an error 403', (done) => {
             let form = {
-                share_url: 'https://myowncloud.wxyz/index.php/s/7EoWgjLSFVV89AO',
-                path: '/',
+                share_url: 'https://sandbox.ODONEZ.org/record/69114',
+                filename: 'metatainer.zip',
                 content_type: 'compendium_v1',
             };
 
@@ -165,15 +192,14 @@ describe('API basics', function () {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 403);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'public share host is not allowed');
+                assert.propertyVal(JSON.parse(body), 'error', 'host is not allowed');
                 done();
             });
         }).timeout(10000);
 
-        it('invalid token: should respond with an error 404', (done) => {
+        it('invalid DOI: should respond with an error 422', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
-                path: '/',
+                doi: 'invalid.doi/09983123',
                 content_type: 'compendium_v1',
             };
 
@@ -189,17 +215,16 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 422);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
+                assert.propertyVal(JSON.parse(body), 'error', 'DOI is invalid');
                 done();
             });
         }).timeout(10000);
 
-        it('invalid webdav path: should respond with an error 404', (done) => {
+        it('invalid zenodo_record_id (not a zenodo record): should respond with an error 422', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO',
-                path: '/ekjsle5',
+                zenodo_record_id: 'eigthhundredseventytwo',
                 content_type: 'compendium_v1',
             };
 
@@ -215,9 +240,60 @@ describe('API basics', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 422);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
+                assert.propertyVal(JSON.parse(body), 'error', 'zenodo_record_id is invalid');
+                done();
+            });
+        }).timeout(10000);
+
+        it('invalid zenodoID in share_url: should respond with an error 422', (done) => {
+            let form = {
+                share_url: 'https://sandbox.zenodo.org/record/asdfasdf',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v2/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 422);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.propertyVal(JSON.parse(body), 'error', 'zenodo ID is not a number');
+                done();
+            });
+        }).timeout(10000);
+
+        it('filename not found: should respond with an error 500', (done) => {
+            let form = {
+                share_url: 'https://sandbox.zenodo.org/record/69114',
+                filename: 'not_existing_file.xyz',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v2/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 500);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.propertyVal(JSON.parse(body), 'error', '{"error":"download failed: //sandbox.zenodo.org/record/69114/files/not_existing_file.xyz"}');
                 done();
             });
         }).timeout(10000);

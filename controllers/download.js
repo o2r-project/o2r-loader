@@ -28,6 +28,7 @@ var validator = require('validator');
 
 
 exports.create = (req, res) => {
+  req.params = {};
   // check user level
   if (!req.isAuthenticated()) {
     res.status(401).send('{"error":"user is not authenticated"}');
@@ -38,16 +39,94 @@ exports.create = (req, res) => {
     return;
   }
 
+  // validate content_type
+  if (req.body.content_type !== 'compendium_v1') {
+    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
+    debug('Provided content_type "%s" not implemented', req.body.content_type);
+    return;
+  }
+
+  // if the DOI parameter exists, extract the zenodo record ID from it
+  if (typeof req.body.doi !== 'undefined') {
+    //regex for a DOI (e.g. "10.5281/zenodo.268443")
+    let doiRegex = new RegExp(/^\d+\.\d+\/zenodo\.\d+$/);
+
+    if (doiRegex.test(req.body.doi)) { //return the zenodoID from the DOI
+      req.params.zenodoID = req.body.doi.split('zenodo.')[1];
+    } else {
+      debug('Invalid doi:', req.body.doi);
+      res.status(422).send('{"error":"DOI is invalid"}');
+      return;
+    }
+
+    req.params.zenodoHost = c.zenodo.default_host;
+    prepareZenodoLoad(req, res);
+    return;
+  }
+
+  // if the zenodo_record_id parameter exists, start the zenodo loader with it
+  if (typeof req.body.zenodo_record_id !== 'undefined') {
+    if (isNaN(req.body.zenodo_record_id)) {
+      debug('Invalid zenodo_record_id:', req.body.zenodo_record_id);
+      res.status(422).send('{"error":"zenodo_record_id is invalid"}');
+      return;
+    }
+    req.params.zenodoID = req.body.zenodo_record_id;
+    req.params.zenodoHost = c.zenodo.default_host;
+    prepareZenodoLoad(req, res);
+    return;
+  }
+
   // validate share_url
   if(!validator.isURL(req.body.share_url)) {
-    debug('Invalid share_url:', req.body.share_url);
-    res.status(404).send('{"error":"public share URL is invalid"}');
-    return;
+      debug('Invalid share_url:', req.body.share_url);
+      res.status(422).send('{"error":"public share URL is invalid"}');
+      return;
+  }
+
+  // get top-level hostname from share_url
+  let parsedURL = url.parse(req.body.share_url);
+  let hostname = parsedURL.hostname.split('.');
+  hostname = hostname[hostname.length - 2];
+
+  //depending on the host, start zenodo loader or sciebo/owncloud loader
+  switch(hostname) {
+    case 'sciebo':
+      prepareScieboLoad(req, res);
+      break;
+    case 'zenodo':
+      // get zenodo record ID from Zenodo URL, e.g. https://sandbox.zenodo.org/record/59917
+      let zenodoPaths = parsedURL.path.split('/');
+      let zenodoID = zenodoPaths[zenodoPaths.length - 1];
+      req.params.zenodoID = zenodoID;
+      req.params.zenodoHost = parsedURL.host;
+      prepareZenodoLoad(req, res);
+      break;
+    case 'doi':
+      // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
+      req.params.zenodoID = parsedURL.path.split('zenodo.')[1];
+      req.params.zenodoHost = c.zenodo.default_host; //Use default host from config
+      prepareZenodoLoad(req, res);
+      break;
+    default:
+      debug('Public share host "%s" is not allowed.', hostname);
+      res.status(403).send('{"error":"host is not allowed"}');
+      debug('public share host is not allowed, supported is: %s', c.webdav.allowedHosts.toString());
+      return;
+  } 
+};
+
+function prepareScieboLoad(req, res) {
+  this.req = req;
+  this.res = res;
+
+  if (!req.body.path) { // set default value for path ('/')
+    req.body.path = '/';
   }
 
   // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
   let validURL = url.parse(req.body.share_url);
-  let hostname = validURL.hostname.split(".");
+  let hostname = validURL.hostname.split('.');
   hostname = hostname[hostname.length - 2];
 
   if (c.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
@@ -57,25 +136,47 @@ exports.create = (req, res) => {
     return;
   }
 
-  if (!req.body.path) { // set default value for path ('/')
-    req.body.path = '/';
+  var loader = new Loader(req, res);
+  loader.loadOwncloud((id, err) => {
+    if (err) {
+      debug('Error during public share load: %s', err.message);
+    } else {
+      debug('New compendium %s successfully loaded', id);
+    }
+  });
+}
+
+function prepareZenodoLoad(req, res) {
+  this.req = req;
+  this.res = res;
+
+  //validate host (must be zenodo or sandbox.zenodo)
+  switch (req.params.zenodoHost) {
+    case 'sandbox.zenodo.org':
+      req.params.baseURL = c.zenodo.zenodo_sandbox_url;
+      break;
+    case 'zenodo.org':
+      req.params.baseURL = c.zenodo.zenodo_url;
+      break;
+    default:
+      debug('Invalid hostname:', req.params.zenodoHost);
+      res.status(403).send('{"error":"host is not allowed"}');
+      return;
   }
 
-  // validate content_type
-  if (req.body.content_type === 'compendium_v1') {
-    debug('Creating new %s for user %s)',
-      req.body.content_type, req.user.id);
+  // validate zenodoID
+  if (!validator.isNumeric(String(req.params.zenodoID))){
+    debug('Invalid zenodoID:', req.params.zenodoID);
+    res.status(422).send('{"error":"zenodo ID is not a number"}');
+    return;
+  }
 
-    var loader = new Loader(req, res);
-    loader.load((id, err) => {
-      if (err) {
-        debug('Error during public share load: %s', err.message);
-      } else {
-        debug('New compendium %s successfully loaded', id);
-      }
-    });
-  } else {
-    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
-    debug('Provided content_type "%s" not implemented', req.body.content_type);
-  } 
-};
+  var loader = new Loader(req, res);
+  loader.loadZenodo((id, err) => {
+    if (err) {
+      debug('Error during zenodo load: %s', err.message);
+    } else {
+      debug('New compendium %s successfully loaded', id);
+    }
+  });
+}
