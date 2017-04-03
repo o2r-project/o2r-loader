@@ -1,6 +1,6 @@
 {
   "name": "o2r-loader",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Node.js implementation for loading compendia and workspaces from external repositories for the [o2r web api](http://o2r.info/o2r-web-api).",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,6 @@
     "connect-mongodb-session": "^1.3.0",
     "debug": "^2.3.3",
     "directory-tree": "^1.1.1",
-    "dockerode": "^2.3.1",
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "fs-extra": "^0.30.0",

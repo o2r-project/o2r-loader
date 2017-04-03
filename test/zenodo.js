@@ -68,7 +68,7 @@ describe('Zenodo loader basics', function () {
 
         it('zenodo record, "doi" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                doi: '10.5072/zenodo.69114',
+                doi: '10.5072/zenodo.69114', // intenally taken apart and using sandbox
                 content_type: 'compendium_v1'
             };
 
@@ -94,7 +94,7 @@ describe('Zenodo loader basics', function () {
 
         it('zenodo record, "doi.org" as "share_url": should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'http://doi.org/10.5072/zenodo.69114',
+                share_url: 'http://doi.org/10.5072/zenodo.69114', // page not found, internally using id in sandbox.zenodo.org
                 filename: 'metatainer.zip',
                 content_type: 'compendium_v1'
             };
