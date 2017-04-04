@@ -1,12 +1,14 @@
 /* eslint-env mocha */
 var mongojs = require('mongojs');
+const config = require('../config/config');
 
 // test parameters for local session authentication directly via fixed database entries
 var orcid = '0000-0001-6021-1617';
 var sessionId = 'C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo';
 
 before(function () {
-    var db = mongojs('localhost/muncher', ['users', 'sessions']);
+    let dbpath = 'localhost/' + config.mongo.database;
+    var db = mongojs(dbpath, ['users', 'sessions']);
 
     var session = {
         '_id': sessionId,
@@ -39,5 +41,5 @@ before(function () {
         if (err) throw err;
     });
 
-    console.log('Global setup completed');
+    console.log('Global setup completed for database ' + dbpath);
 });

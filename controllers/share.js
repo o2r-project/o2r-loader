@@ -17,7 +17,7 @@
 
 // General modules
 var c = require('../config/config');
-var debug = require('debug')('loader');
+var debug = require('debug')('loader:ctrl:share');
 var fs = require('fs');
 
 var Compendium = require('../lib/model/compendium');
@@ -29,15 +29,6 @@ var validator = require('validator');
 
 exports.create = (req, res) => {
   req.params = {};
-  // check user level
-  if (!req.isAuthenticated()) {
-    res.status(401).send('{"error":"user is not authenticated"}');
-    return;
-  }
-  if (req.user.level < c.user.level.create_compendium) {
-    res.status(401).send('{"error":"user level does not allow compendium creation"}');
-    return;
-  }
 
   // validate content_type
   if (req.body.content_type !== 'compendium_v1') {
@@ -117,9 +108,6 @@ exports.create = (req, res) => {
 };
 
 function prepareScieboLoad(req, res) {
-  this.req = req;
-  this.res = res;
-
   if (!req.body.path) { // set default value for path ('/')
     req.body.path = '/';
   }
@@ -147,9 +135,6 @@ function prepareScieboLoad(req, res) {
 }
 
 function prepareZenodoLoad(req, res) {
-  this.req = req;
-  this.res = res;
-
   //validate host (must be zenodo or sandbox.zenodo)
   switch (req.params.zenodoHost) {
     case 'sandbox.zenodo.org':

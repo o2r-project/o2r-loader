@@ -1,0 +1,52 @@
+/*
+ * (C) Copyright 2016 o2r project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// General modules
+var c = require('../config/config');
+var debug = require('debug')('loader:ctrl:dispatch');
+
+// load controllers
+var createFromShare = require('./share').create;
+var createFromDirectUpload = require('./direct_upload').create;
+
+var Loader = require('../lib/loader').Loader;
+
+
+exports.dispatch = (req, res) => {
+  debug('Dispatching %s', req.originalURL);
+
+  // check user level
+  if (!req.isAuthenticated()) {
+    res.status(401).send('{"error":"user is not authenticated"}');
+    return;
+  }
+  if (req.user.level < c.user.level.create_compendium) {
+    res.status(401).send('{"error":"user level does not allow compendium creation"}');
+    return;
+  }
+
+  // distinguish between
+  // a) direct upload with a file attachment
+  // b) no file attachment = get from share via URL parameter
+  if(req.file) {
+    debug('Detected file in request, dispatching to direct upload: %s', JSON.stringify(req.file));
+    createFromUpload(req, res);
+  } else {
+    debug('Detected _no_ file in request, dispatching to share upload: %s', JSON.stringify(req.body));
+    createFromShare(req, res);
+  }  
+};

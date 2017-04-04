@@ -8,7 +8,7 @@ const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2
 const requestLoadingTimeout = 20000;
 
 
-describe('Sciebo loader basics', function () {
+describe('Sciebo loader', function () {
 
     var compendium_id = '';
 
@@ -24,7 +24,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -51,7 +51,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -78,7 +78,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -104,7 +104,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -117,7 +117,9 @@ describe('Sciebo loader basics', function () {
                 done();
             });
         }).timeout(10000);
+    });
 
+    describe('No new compendium with invalid requests', () => {
         it('invalid share URL: should respond with an error 422', (done) => {
             let form = {
                 share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
@@ -130,7 +132,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -156,7 +158,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -182,7 +184,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -208,7 +210,7 @@ describe('Sciebo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,

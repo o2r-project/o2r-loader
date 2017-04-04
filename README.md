@@ -1,8 +1,8 @@
 # o2r-loader
 
-Node.js implementation to load compendia from third party repositories and resources via the [o2r web api](http://o2r.info/o2r-web-api).
+Node.js implementation to load compendia from third party repositories and handle direct user uploads for the [o2r web api](http://o2r.info/o2r-web-api).
 
-Currently, it implements the endpoint `/api/v2/compendium`.
+Currently, it implements the endpoint `/api/v1/compendium`.
 
 ## Supported repositories
 
@@ -33,6 +33,8 @@ The configuration can be done via environment variables.
   Which database inside the mongo db should be used. Defaults to `muncher`.
 - `LOADER_BASEPATH`
   The local path where compendia are stored. Defaults to `/tmp/o2r/`.
+- `LOADER_META_TOOL_EXE` __Required__
+  Executable for metadata tools, defaults to `python3 ../o2r-meta/o2rmeta.py`. You will very likely need to change this.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 

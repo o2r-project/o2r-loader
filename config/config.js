@@ -15,7 +15,6 @@
  *
  */
 var c = {};
-c.version = {};
 c.net = {};
 c.mongo = {};
 c.fs = {};
@@ -24,10 +23,7 @@ c.zenodo = {};
 var env = process.env;
 
 // Information about loader
-c.version.major = 0;
-c.version.minor = 0;
-c.version.bug = 1;
-c.version.api = 1;
+c.api_version = 1;
 
 // network & database
 c.net.port = env.LOADER_PORT || 8088;
@@ -48,7 +44,7 @@ c.fs.incoming   = c.fs.base + 'incoming/';
 c.fs.compendium = c.fs.base + 'compendium/';
 c.fs.delete_inc = true;
 
-c.id_length = 5;   // length of job & compendium ids [0-9,a-z,A-Z]
+c.id_length = 5; // length of compendium ids [0-9,a-z,A-Z]
 
 // session secret
 c.sessionsecret = env.SESSION_SECRET || 'o2r';
@@ -77,7 +73,7 @@ c.bagtainer.forceImageRemoval = true;
 
 // metadata extraction and brokering options
 c.bagtainer.metaextract = {};
-c.bagtainer.metaextract.cliPath = env.MUNCHER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+c.bagtainer.metaextract.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
 c.bagtainer.metaextract.module = 'extract';
 c.bagtainer.metaextract.outputDir = '.erc';
 c.bagtainer.metaextract.targetElement = 'o2r';

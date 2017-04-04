@@ -3,12 +3,12 @@ const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
 
-const host = 'http://localhost:'  + config.net.port;
+const host = 'http://localhost:' + config.net.port;
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 20000;
 
 
-describe('Zenodo loader basics', function () {
+describe('Zenodo loader', function () {
 
     var compendium_id = '';
 
@@ -24,7 +24,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -51,7 +51,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -77,7 +77,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -94,7 +94,7 @@ describe('Zenodo loader basics', function () {
 
         it('zenodo record, "doi.org" as "share_url": should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'http://doi.org/10.5072/zenodo.69114', // page not found, internally using id in sandbox.zenodo.org
+                share_url: 'http://doi.org/10.5072/zenodo.69114', // page not found, internally using only id in sandbox.zenodo.org
                 filename: 'metatainer.zip',
                 content_type: 'compendium_v1'
             };
@@ -104,7 +104,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -130,7 +130,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -144,7 +144,9 @@ describe('Zenodo loader basics', function () {
                 done();
             });
         }).timeout(20000);
+    });
 
+    describe('No new compendium based on invalid parameters', () => {
         it('invalid zenodo URL: should respond with an error 422', (done) => {
             let form = {
                 share_url: 'htts?///sandbox.zenodo.org/record/69114',
@@ -157,7 +159,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -183,7 +185,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -208,7 +210,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -233,7 +235,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -258,7 +260,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -284,7 +286,7 @@ describe('Zenodo loader basics', function () {
             j.setCookie(ck, host);
 
             request({
-                uri: host + '/api/v2/compendium',
+                uri: host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -297,6 +299,6 @@ describe('Zenodo loader basics', function () {
                 done();
             });
         }).timeout(10000);
-    });  
+    });
 });
 
