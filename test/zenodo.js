@@ -294,8 +294,34 @@ describe('Zenodo loader', function () {
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 500);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', '{"error":"download failed: //sandbox.zenodo.org/record/69114/files/not_existing_file.xyz"}');
+                done();
+            });
+        }).timeout(10000);
+
+        it('filename not found: should respond with a useful but not talkative error message', (done) => {
+            let form = {
+                share_url: 'https://sandbox.zenodo.org/record/69114',
+                filename: 'not_existing_file.xyz',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, host);
+
+            request({
+                uri: host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                let responsebody = JSON.parse(body);
+                assert.isUndefined(responsebody.id, 'returned no id');
+                assert.include(responsebody.error, 'download failed:');
+                assert.include(responsebody.error, 'sandbox.zenodo.org/record/69114/files/not_existing_file.xyz');
+                assert.notInclude(responsebody.error, config.fs.base);
                 done();
             });
         }).timeout(10000);
