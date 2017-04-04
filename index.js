@@ -39,6 +39,7 @@ const compression = require('compression');
 const app = express();
 const responseTime = require('response-time');
 const bodyParser = require('body-parser');
+const randomstring = require('randomstring');
 
 app.use((req, res, next) => {
   debug(req.method + ' ' + req.path);
@@ -57,7 +58,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-var dispatch = require('./controllers/dispatch').dispatch;
+const dispatch = require('./controllers/dispatch').dispatch;
 
 /*
  *  Authentication & Authorization
@@ -82,14 +83,14 @@ passport.deserializeUser((id, cb) => {
 fse.mkdirsSync(config.fs.incoming);
 fse.mkdirsSync(config.fs.compendium);
 
-var multer = require('multer');
-var storage = multer.diskStorage({
+const multer = require('multer');
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     debug('Saving userfile %s to %s', file.originalname, config.fs.incoming);
     cb(null, config.fs.incoming);
   },
   filename: (req, file, cb) => {
-    let id = randomstring.generate(c.id_length);
+    let id = randomstring.generate(config.id_length);
     debug('Generated id "%s" for user file %s of fieldname %s', id, file.originalname, file.fieldname);
     cb(null, id);
   }
