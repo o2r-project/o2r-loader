@@ -16,6 +16,7 @@
  */
 
 const config = require('./config/config');
+config.version = require('./package.json').version;
 const debug = require('debug')('loader');
 const mongoose = require('mongoose');
 const backoff = require('backoff');
@@ -38,6 +39,7 @@ const compression = require('compression');
 const app = express();
 const responseTime = require('response-time');
 const bodyParser = require('body-parser');
+const randomstring = require('randomstring');
 
 app.use((req, res, next) => {
   debug(req.method + ' ' + req.path);
@@ -56,9 +58,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-// load controllers
-var controllers = {};
-controllers.download = require('./controllers/download');
+const dispatch = require('./controllers/dispatch').dispatch;
 
 /*
  *  Authentication & Authorization
@@ -76,6 +76,26 @@ passport.deserializeUser((id, cb) => {
     cb(null, user);
   });
 });
+
+/*
+ *  File Upload: check fs & create dirs if necessary
+ */
+fse.mkdirsSync(config.fs.incoming);
+fse.mkdirsSync(config.fs.compendium);
+
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    debug('Saving userfile %s to %s', file.originalname, config.fs.incoming);
+    cb(null, config.fs.incoming);
+  },
+  filename: (req, file, cb) => {
+    let id = randomstring.generate(config.id_length);
+    debug('Generated id "%s" for user file %s of fieldname %s', id, file.originalname, file.fieldname);
+    cb(null, id);
+  }
+});
+var upload = multer({ storage: storage });
 
 function initApp(callback) {
   debug('Initialize application');
@@ -110,8 +130,8 @@ function initApp(callback) {
     /*
      * configure routes
      */
-    app.post('/api/v2/compendium', controllers.download.create);
-
+    app.post('/api/v1/compendium', upload.single('compendium'), dispatch);
+    
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');
       if (!req.isAuthenticated() || req.user.level < config.user.level.view_status) {
@@ -130,11 +150,9 @@ function initApp(callback) {
     });
 
     app.listen(config.net.port, () => {
-      debug('loader %s.%s.%s with API version %s waiting for requests on port %s',
-        config.version.major,
-        config.version.minor,
-        config.version.bug,
-        config.version.api,
+      debug('loader %s with API version %s waiting for requests on port %s',
+        config.version,
+        config.api_version,
         config.net.port);
     });
   } catch (err) {

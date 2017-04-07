@@ -15,18 +15,15 @@
  *
  */
 var c = {};
-c.version = {};
 c.net = {};
 c.mongo = {};
 c.fs = {};
 c.webdav = {};
+c.zenodo = {};
 var env = process.env;
 
 // Information about loader
-c.version.major = 0;
-c.version.minor = 0;
-c.version.bug = 1;
-c.version.api = 1;
+c.api_version = 1;
 
 // network & database
 c.net.port = env.LOADER_PORT || 8088;
@@ -47,7 +44,7 @@ c.fs.incoming   = c.fs.base + 'incoming/';
 c.fs.compendium = c.fs.base + 'compendium/';
 c.fs.delete_inc = true;
 
-c.id_length = 5;   // length of job & compendium ids [0-9,a-z,A-Z]
+c.id_length = 5; // length of compendium ids [0-9,a-z,A-Z]
 
 // session secret
 c.sessionsecret = env.SESSION_SECRET || 'o2r';
@@ -59,63 +56,24 @@ c.user.level.load_webdav = 100;
 
 // bagtainer configuration
 c.bagtainer = {};
-c.bagtainer.supportedVersions = ['0.1'];
+c.bagtainer.supportedVersions = ['0.1', '1'];
 c.bagtainer.payloadDirectory = '/data';
 c.bagtainer.configFile = '/data/bagtainer.yml';
-c.bagtainer.scan = {};
-c.bagtainer.scan.enable = false; // not feasible without daemon virus scanner in container
-c.bagtainer.scan.settings = { // see https://www.npmjs.com/package/clamscan
-  remove_infected: true,
-  debug_mode: true,
-  list_recursively: true,
-  //scan_log: '/var/log/clamscan.log', // file must exist!
-  /*clamdscan: {
-    config_file: '/etc/clamav/clamd.conf'
-  },*/
-  preference: 'clamdscan'
-  // clamdscan does not work in container but is _way_ faster
-};
-c.bagtainer.scan.email = {};
-c.bagtainer.scan.email.enable = true;
-c.bagtainer.scan.email.transport = env.MUNCHER_EMAIL_TRANSPORT; // https://www.npmjs.com/package/nodemailer
-c.bagtainer.scan.email.receivers = env.MUNCHER_EMAIL_RECEIVERS;
-c.bagtainer.scan.email.sender = env.MUNCHER_EMAIL_SENDER;
-c.bagtainer.bagit = {};
-c.bagtainer.bagit.validateFast = false;
 c.bagtainer.keepContainers = false; // set this to true for debugging runtime options
 c.bagtainer.keepImages = true; // required for image download!
 c.bagtainer.validateBeforeExecute = true; // cannot validate before execute when saving image tarball but not updating the bag
+
 c.bagtainer.bagit = {};
+c.bagtainer.bagit.validateFast = false;
 c.bagtainer.bagit.failOnValidationError= {};
 c.bagtainer.bagit.failOnValidationError.upload = true;
 c.bagtainer.bagit.failOnValidationError.execute = false;
 c.bagtainer.imageNamePrefix = 'bagtainer:';
 c.bagtainer.forceImageRemoval = true;
-c.bagtainer.docker = {};
-// See https://docs.docker.com/engine/reference/commandline/create/ and https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#create-a-container
-c.bagtainer.docker.create_options = {
-  //AttachStderr: true,
-  //AttachStdin: false,
-  //AttachStdout: true,
-  //Cmd: ['bash', '-c', 'cat /etc/resolv.conf'],
-  CpuShares: 256,
-  //Cpuset: '',
-  //Domainname: '',
-  //Entrypoint: null,
-  Env: ['O2RPLATFORM=true'],
-  //Hostname: 'b9ea983254ef',
-  Memory: 1073741824, // 1G
-  MemorySwap: 2147483648, // double of 1G
-  NetworkMode: 'none',
-  Rm: true
-};
-// https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#start-a-container
-c.bagtainer.docker.start_options = {
-};
 
 // metadata extraction and brokering options
 c.bagtainer.metaextract = {};
-c.bagtainer.metaextract.cliPath = env.MUNCHER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+c.bagtainer.metaextract.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
 c.bagtainer.metaextract.module = 'extract';
 c.bagtainer.metaextract.outputDir = '.erc';
 c.bagtainer.metaextract.targetElement = 'o2r';
@@ -125,5 +83,14 @@ c.bagtainer.metaextract.failOnNoMetadata = false;
 c.webdav.allowedHosts = ['sciebo'];
 c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
 //c.webdav.urlString = 'nextcloud/public.php/dav'; //nextcloud public webdav url
+
+// Zenodo configuration
+// default URL and host that is used to download files if the URL itself is not specified in the request (e.g. via DOI or zenodo_record_id parameter)
+c.zenodo.default_url = 'https://sandbox.zenodo.org/';
+c.zenodo.default_host = 'sandbox.zenodo.org';
+
+// base urls for Zenodo and Zenodo sandbox
+c.zenodo.zenodo_sandbox_url = 'https://sandbox.zenodo.org/';
+c.zenodo.zenodo_url = 'https://zenodo.org/';
 
 module.exports = c;
