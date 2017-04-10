@@ -20,7 +20,7 @@ const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
 
-const host = 'http://localhost:'  + config.net.port;
+require("./setup")
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 20000;
 
@@ -38,10 +38,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -65,10 +65,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -92,10 +92,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -118,10 +118,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -146,10 +146,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -172,10 +172,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -198,10 +198,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,
@@ -224,10 +224,10 @@ describe('Sciebo loader', function () {
 
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 form: form,

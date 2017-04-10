@@ -21,7 +21,7 @@ const request = require('request');
 const fs = require('fs');
 const config = require('../config/config');
 
-const host = 'http://localhost:' + config.net.port;
+require("./setup")
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 10000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
@@ -30,7 +30,7 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 describe('Direct upload of ERC', function () {
     describe('POST /api/v1/compendium response with executable ERC', () => {
         before((done) => {
-            let req = createCompendiumPostRequest(host, './test/erc/executable', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -39,8 +39,8 @@ describe('Direct upload of ERC', function () {
         });
 
         it('should respond with HTTP 200 OK', (done) => {
-            request(host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest(host, './test/erc/executable', cookie_o2r);
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -51,8 +51,8 @@ describe('Direct upload of ERC', function () {
         });
 
         it('should respond with valid JSON', (done) => {
-            request(host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest(host, './test/erc/executable', cookie_o2r);
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -63,8 +63,8 @@ describe('Direct upload of ERC', function () {
         });
 
         it('should give a response including the id field', (done) => {
-            request(host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest(host, './test/erc/executable', cookie_o2r);
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -79,7 +79,7 @@ describe('Direct upload of ERC', function () {
 
     describe('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
-            let req = createCompendiumPostRequest(host, './test/erc/invalid_bag', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -90,7 +90,7 @@ describe('Direct upload of ERC', function () {
         }).timeout(requestLoadingTimeout);
 
         it('should not tell about internal server configuration in the error message', (done) => {
-            let req = createCompendiumPostRequest(host, './test/erc/invalid_bag', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);

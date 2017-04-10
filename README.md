@@ -60,6 +60,12 @@ Tests found in the file `api.js` can be started using mocha:
 npm install
 npm install -g mocha
 mocha
+
+# alternative:
+npm test
+
+# set test endpoint manually
+TEST_HOST=http://localhost:80 npm test
 ```
 For this, the loader has to run locally or as part of a docker-compose configuration.
 

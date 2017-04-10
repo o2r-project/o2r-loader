@@ -21,7 +21,7 @@ const request = require('request');
 const fs = require('fs');
 const config = require('../config/config');
 
-const host = 'http://localhost:' + config.net.port;
+require("./setup")
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 2000;
 
@@ -41,10 +41,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
@@ -71,10 +71,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
@@ -100,10 +100,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
@@ -129,10 +129,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
@@ -157,10 +157,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
@@ -184,10 +184,10 @@ describe('Direct upload of invalid files', function () {
             };
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, host);
+            j.setCookie(ck, global.test_host);
 
             request({
-                uri: host + '/api/v1/compendium',
+                uri: global.test_host + '/api/v1/compendium',
                 method: 'POST',
                 jar: j,
                 formData: formData,
