@@ -23,6 +23,10 @@ const config = require('../config/config');
 var orcid = '0000-0001-6021-1617';
 var sessionId = 'C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo';
 
+var env = process.env;
+global.test_host = env.TEST_HOST ||  'http://localhost:' + config.net.port;
+console.log('Testing endpoint at ' + global.test_host);
+
 before(function () {
     let dbpath = 'localhost/' + config.mongo.database;
     var db = mongojs(dbpath, ['users', 'sessions']);
