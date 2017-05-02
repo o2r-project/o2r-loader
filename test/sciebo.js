@@ -166,7 +166,7 @@ describe('Sciebo loader', function () {
 
         it('invalid host (not a sciebo public share): should respond with an error 403', (done) => {
             let form = {
-                share_url: 'https://myowncloud.wxyz/index.php/s/7EoWgjLSFVV89AO',
+                share_url: 'https://myowncloud.wxyz/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/',
                 content_type: 'compendium_v1',
             };
@@ -218,7 +218,7 @@ describe('Sciebo loader', function () {
 
         it('invalid webdav path: should respond with an error 404', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
                 content_type: 'compendium_v1',
             };
@@ -244,7 +244,7 @@ describe('Sciebo loader', function () {
 
         it('insufficient user level: should respond with an error 401', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
                 content_type: 'compendium_v1',
             };

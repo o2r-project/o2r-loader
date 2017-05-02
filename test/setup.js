@@ -50,7 +50,7 @@ before(function () {
                 'user': orcid
             }
         }
-    }
+    };
     db.sessions.save(session, function (err, doc) {
         //console.log(doc);
         if (err) throw err;
@@ -70,13 +70,11 @@ before(function () {
                 'user': orcid_plain
             }
         }
-    }
+    };
     db.sessions.save(session_plain, function (err, doc) {
         if (err) throw err;
     });
 
-
-    
     var o2ruser = {
         '_id': '57dc171b8760d15dc1864044',
         'orcid': orcid,
