@@ -22,6 +22,7 @@ const config = require('../config/config');
 
 require("./setup")
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
+const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9ydziuJ+DzFG9GnAZRvaaM';
 const requestLoadingTimeout = 20000;
 
 
@@ -237,6 +238,32 @@ describe('Sciebo loader', function () {
                 assert.equal(res.statusCode, 404);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
                 assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
+                done();
+            });
+        }).timeout(10000);
+
+        it('insufficient user level: should respond with an error 401', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7EoWgjLSFVV89AO',
+                path: '/ekjsle5',
+                content_type: 'compendium_v1',
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie_plain);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 401);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.propertyVal(JSON.parse(body), 'error', 'user level does not allow compendium creation');
                 done();
             });
         }).timeout(10000);
