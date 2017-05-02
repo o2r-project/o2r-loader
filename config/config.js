@@ -52,7 +52,7 @@ c.sessionsecret = env.SESSION_SECRET || 'o2r';
 // authentication levels
 c.user = {};
 c.user.level = {};
-c.user.level.load_webdav = 100;
+c.user.level.create_compendium = 100;
 
 // bagtainer configuration
 c.bagtainer = {};
