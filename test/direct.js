@@ -76,7 +76,6 @@ describe('Direct upload of ERC', function () {
         });
     });
 
-
     describe('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
