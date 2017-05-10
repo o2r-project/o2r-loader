@@ -72,13 +72,25 @@ c.bagtainer.imageNamePrefix = 'bagtainer:';
 c.bagtainer.forceImageRemoval = true;
 
 // metadata extraction and brokering options
-c.bagtainer.metaextract = {};
-c.bagtainer.metaextract.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
-c.bagtainer.metaextract.module = 'extract';
-c.bagtainer.metaextract.outputDir = '.erc';
-c.bagtainer.metaextract.targetElement = 'o2r';
-c.bagtainer.metaextract.bestCandidateFile = 'metadata_raw.json';
-c.bagtainer.metaextract.failOnNoMetadata = false;
+c.meta = {};
+c.meta.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+
+c.meta.extract = {};
+c.meta.extract.module = 'extract';
+c.meta.extract.outputDir = '.erc';
+c.meta.extract.targetElement = 'o2r';
+c.meta.extract.bestCandidateFile = 'metadata_raw.json';
+c.meta.extract.failOnNoMetadata = false;
+
+c.meta.broker = {};
+c.meta.broker.enable = true;
+c.meta.broker.module = 'broker';
+c.meta.broker.mappings = {
+  zenodo: {
+    targetElement: 'zenodo',
+    mappingFile: '../o2r-meta/broker/mappings/zenodo-map.json'
+  }
+};
 
 c.webdav.allowedHosts = ['sciebo'];
 c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
