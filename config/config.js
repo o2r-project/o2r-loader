@@ -83,6 +83,7 @@ c.meta.extract.bestCandidateFile = 'metadata_raw.json';
 c.meta.extract.failOnNoMetadata = false;
 
 c.meta.broker = {};
+c.meta.broker.enable = true;
 c.meta.broker.module = 'broker';
 c.meta.broker.mappings = {
   zenodo: {
