@@ -40,6 +40,7 @@ RUN apk add --no-cache \
 WORKDIR /meta
 RUN pip install -r requirements.txt
 ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
+ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
 
 RUN apk del \
     git \
