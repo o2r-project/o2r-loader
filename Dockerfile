@@ -41,6 +41,7 @@ WORKDIR /meta
 RUN pip install -r requirements.txt
 ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
 ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
+RUN echo $(git rev-parse --short HEAD) >> version
 
 RUN apk del \
     git \
@@ -57,6 +58,7 @@ ARG VERSION=dev
 ARG VCS_URL
 ARG VCS_REF
 ARG BUILD_DATE
+ARG META_VERSION
 
 # Metadata http://label-schema.org/rc1/
 LABEL org.label-schema.vendor="o2r project" \
@@ -67,7 +69,8 @@ LABEL org.label-schema.vendor="o2r project" \
       org.label-schema.vcs-url=$VCS_URL \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.docker.schema-version="rc1"
+      org.label-schema.docker.schema-version="rc1" \
+      info.o2r.meta.version=$META_VERSION
 
 ENTRYPOINT ["/sbin/dumb-init", "--"]
 CMD ["npm", "start" ]
