@@ -88,8 +88,9 @@ c.meta.broker.module = 'broker';
 c.meta.broker.mappings = {
   zenodo: {
     targetElement: 'zenodo',
-    mappingFile: '../o2r-meta/broker/mappings/zenodo-map.json'
-  }
+    file: 'zenodo-map.json'
+  },
+  dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
 
 c.webdav.allowedHosts = ['sciebo'];
