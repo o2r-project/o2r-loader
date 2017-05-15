@@ -53,15 +53,26 @@ describe('Metadata brokering during upload of ERC ', function () {
             });
         });
 
-        it('should contain brokered metadata to zenodo', (done) => {
+        it('should contain brokered metadata to zenodo in correct structure', (done) => {
             request(global.test_host_read + '/api/v1/compendium/' + compendium_id, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
                 assert.property(response, 'metadata');
                 assert.property(response.metadata, 'zenodo');
-                assert.property(response.metadata.zenodo, 'upload_type');
-                assert.propertyVal(response.metadata.zenodo, 'upload_type', 'publication');
-                assert.propertyVal(response.metadata.zenodo, 'title', 'This is the title: it contains a colon');
+                assert.property(response.metadata.zenodo, 'metadata');
+                assert.property(response.metadata.zenodo.metadata, 'upload_type');
+                assert.property(response.metadata.zenodo.metadata, 'title');
+                assert.property(response.metadata.zenodo.metadata, 'description');
+                done();
+            });
+        });
+
+        it('should contain brokered metadata to zenodo with correct values', (done) => {
+            request(global.test_host_read + '/api/v1/compendium/' + compendium_id, (err, res, body) => {
+                assert.ifError(err);
+                let response = JSON.parse(body);
+                assert.propertyVal(response.metadata.zenodo.metadata, 'upload_type', 'publication');
+                assert.propertyVal(response.metadata.zenodo.metadata, 'title', 'This is the title: it contains a colon');
                 done();
             });
         });

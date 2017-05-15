@@ -87,7 +87,7 @@ c.meta.broker.enable = true;
 c.meta.broker.module = 'broker';
 c.meta.broker.mappings = {
   zenodo: {
-    targetElement: 'zenodo',
+    targetElement: 'zenodo.metadata',
     file: 'zenodo-map.json'
   },
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'

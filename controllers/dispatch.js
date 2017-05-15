@@ -27,7 +27,7 @@ var Loader = require('../lib/loader').Loader;
 
 
 exports.dispatch = (req, res) => {
-  debug('Dispatching %s', req.originalURL);
+  debug('Dispatching %s', req.originalUrl);
 
   // check user level
   if (!req.isAuthenticated()) {
