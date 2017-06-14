@@ -77,7 +77,8 @@ describe('Direct upload of ERC', function () {
         }).timeout(10000);
     });
 
-    describe('POST /api/v1/compendium with invalid bag', () => {
+    // bag is not validated on upload by default anymore
+    describe.skip('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
