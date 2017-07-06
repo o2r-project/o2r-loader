@@ -20,6 +20,7 @@ RUN apk add --no-cache --update\
     wget \
     unzip \
     nodejs \
+    nodejs-npm \
     openssl \
     ca-certificates \
   && pip install --upgrade pip \
