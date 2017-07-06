@@ -35,6 +35,8 @@ The configuration can be done via environment variables.
   The local path where compendia are stored. Defaults to `/tmp/o2r/`.
 - `LOADER_META_TOOL_EXE` __Required__
   Executable for metadata tools, defaults to `python3 ../o2r-meta/o2rmeta.py`. You will very likely need to change this.
+- `LOADER_META_EXTRACT_MAPPINGS_DIR` __Required__
+  Path to extraction mappings, defaults to `../o2r-meta/broker/mappings`. You will very likely need to change this.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 

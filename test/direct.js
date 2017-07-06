@@ -29,8 +29,9 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 
 describe('Direct upload of ERC', function () {
     describe('POST /api/v1/compendium response with executable ERC', () => {
-        before((done) => {
+        before(function (done) {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+            this.timeout(10000);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -48,7 +49,7 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        });
+        }).timeout(10000);
 
         it('should respond with valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -60,7 +61,7 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        });
+        }).timeout(10000);
 
         it('should give a response including the id field', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -73,11 +74,11 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        });
+        }).timeout(10000);
     });
 
-
-    describe('POST /api/v1/compendium with invalid bag', () => {
+    // bag is not validated on upload by default anymore
+    describe.skip('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 

@@ -29,6 +29,7 @@ var sessionId_plain = 'yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq';
 
 var env = process.env;
 global.test_host = env.TEST_HOST ||  'http://localhost:' + config.net.port;
+global.test_host_read = env.TEST_HOST_READ ||  'http://localhost:8080';
 console.log('Testing endpoint at ' + global.test_host);
 
 before(function () {
