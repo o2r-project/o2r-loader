@@ -18,6 +18,7 @@ var c = {};
 c.net = {};
 c.mongo = {};
 c.fs = {};
+c.encoding = {};
 c.webdav = {};
 c.zenodo = {};
 var env = process.env;
@@ -92,6 +93,10 @@ c.meta.broker.mappings = {
   },
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
+
+c.encoding.supportedEncodings = ['UTF-8','UTF-16BE','UTF-16LE','UTF-32BE','UTF-32LE'];
+c.encoding.textFileRegex = '.*\.(txt|rmd|r|tex|json|yml|yaml)';
+c.encoding.confidenceThreshold = 60;
 
 c.webdav.allowedHosts = ['sciebo'];
 c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
