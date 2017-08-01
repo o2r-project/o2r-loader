@@ -94,8 +94,8 @@ c.meta.broker.mappings = {
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
 
-c.encoding.supportedEncodings = ['UTF-8','UTF-16BE','UTF-16LE','UTF-32BE','UTF-32LE'];
-c.encoding.textFileRegex = '.*\.(txt|rmd|r|tex|json|yml|yaml)';
+c.encoding.supportedEncodings = ['ISO-8859-1' ,'UTF-8','UTF-16BE','UTF-16LE','UTF-32BE','UTF-32LE'];
+c.encoding.textFileRegex = '\.(txt|rmd|r|tex|json|yml|yaml)';
 c.encoding.confidenceThreshold = 60;
 
 c.webdav.allowedHosts = ['sciebo'];

@@ -41,6 +41,7 @@
     "object-path": "^0.11.4",
     "passport": "^0.3.2",
     "randomstring": "^1.1.5",
+    "recursive-readdir": "^2.2.1",
     "request": "^2.79.0",
     "response-time": "^2.3.2",
     "validator": "^6.2.1",
