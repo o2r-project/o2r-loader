@@ -199,4 +199,36 @@ describe('Direct upload of invalid files', function () {
             });
         });
     });
+
+    describe('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
+        it('should respond with HTTP 422 error', (done) => {
+            let formData = {
+                'content_type': 'compendium_v1',
+                'compendium': {
+                    value: fs.createReadStream('./test/erc/unsupported_encoding.zip'),
+                    options: {
+                        contentType: 'application/zip'
+                    }
+                }
+            };
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                formData: formData,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 422);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).error, 'returned error');
+                assert.propertyVal(JSON.parse(body), 'error', 'encoding not supported');
+                done();
+            });
+        });
+    });
 });
