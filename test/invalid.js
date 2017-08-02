@@ -226,7 +226,9 @@ describe('Direct upload of invalid files', function () {
                 assert.equal(res.statusCode, 422);
                 assert.isObject(JSON.parse(body), 'returned JSON');
                 assert.isDefined(JSON.parse(body).error, 'returned error');
-                assert.propertyVal(JSON.parse(body), 'error', 'encoding not supported');
+                assert.include(JSON.parse(body).error, 'files with unsupported encoding detected: ');
+                assert.include(JSON.parse(body).error, '"encoding":"Shift_JIS"');
+                assert.include(JSON.parse(body).error, '/data/test.txt');
                 done();
             });
         });
