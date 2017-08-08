@@ -12,21 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM frolvlad/alpine-python3
-MAINTAINER o2r-project <https://o2r.info>
+FROM alpine:3.6
+
+# Python, based on frolvlad/alpine-python3
+RUN apk add --no-cache \
+  python3 \
+  && python3 -m ensurepip \
+  && rm -r /usr/lib/python*/ensurepip \
+  && pip3 install --upgrade pip setuptools \
+  && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
+  && rm -r /root/.cache
+
+# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
+RUN echo \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 
 RUN apk add --no-cache --update\
     git \
     wget \
     unzip \
     nodejs \
+    nodejs-npm \
     openssl \
     ca-certificates \
-  && pip install --upgrade pip \
+    dumb-init \
   && pip install bagit \
-  && git clone --depth 1 -b master https://github.com/o2r-project/o2r-loader /loader \
-  && wget -O /sbin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 \
-  && chmod +x /sbin/dumb-init
+  && git clone --depth 1 -b master https://github.com/o2r-project/o2r-loader /loader
 
 # o2r-meta
 RUN apk add --no-cache \
@@ -35,7 +48,9 @@ RUN apk add --no-cache \
     python3-dev \
     libxml2-dev \
     libxslt-dev \
-  && apk add gdal gdal-dev py-gdal --no-cache --repository http://nl.alpinelinux.org/alpine/edge/testing \
+    gdal \
+    gdal-dev \
+    py-gdal \
   && git clone --depth 1 -b master https://github.com/o2r-project/o2r-meta.git /meta
 WORKDIR /meta
 RUN pip install -r requirements.txt
@@ -72,5 +87,5 @@ LABEL org.label-schema.vendor="o2r project" \
       org.label-schema.docker.schema-version="rc1" \
       info.o2r.meta.version=$META_VERSION
 
-ENTRYPOINT ["/sbin/dumb-init", "--"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["npm", "start" ]
