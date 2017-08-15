@@ -224,11 +224,12 @@ describe('Direct upload of invalid files', function () {
             }, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 422);
-                assert.isObject(JSON.parse(body), 'returned JSON');
-                assert.isDefined(JSON.parse(body).error, 'returned error');
-                assert.include(JSON.parse(body).error, 'files with unsupported encoding detected: ');
-                assert.include(JSON.parse(body).error, '"encoding":"Shift_JIS"');
-                assert.include(JSON.parse(body).error, '/data/test.txt');
+                assert.isObject(JSON.parse(body).error, 'returned JSON');
+                assert.isDefined(JSON.parse(body).error.message, 'returned error');
+                assert.include(JSON.parse(body).error.message, 'Files with unsupported encoding detected. Only UTF-8 is supported.');
+                assert.isArray(JSON.parse(body).error.files, 'returned files');
+                assert.include(JSON.parse(body).error.files[0].file, '/data/test.txt');
+                assert.include(JSON.parse(body).error.files[0].encoding, 'Shift_JIS');
                 done();
             });
         });
