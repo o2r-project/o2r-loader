@@ -199,4 +199,39 @@ describe('Direct upload of invalid files', function () {
             });
         });
     });
+
+    describe('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
+        it('should respond with HTTP 422 error', (done) => {
+            let formData = {
+                'content_type': 'compendium_v1',
+                'compendium': {
+                    value: fs.createReadStream('./test/erc/unsupported_encoding.zip'),
+                    options: {
+                        contentType: 'application/zip'
+                    }
+                }
+            };
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                formData: formData,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 422);
+                assert.isObject(JSON.parse(body).error, 'returned JSON');
+                assert.isDefined(JSON.parse(body).error.message, 'returned error');
+                assert.include(JSON.parse(body).error.message, 'Files with unsupported encoding detected. Only UTF-8 is supported.');
+                assert.isArray(JSON.parse(body).error.files, 'returned files');
+                assert.include(JSON.parse(body).error.files[0].file, '/data/test.txt');
+                assert.include(JSON.parse(body).error.files[0].encoding, 'Shift_JIS');
+                done();
+            });
+        });
+    });
 });
