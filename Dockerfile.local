@@ -38,6 +38,8 @@ RUN apk add --no-cache --update\
     openssl \
     ca-certificates \
     dumb-init \
+    # needed by node-gyp, for detect-character-encoding
+    make \
   && pip install bagit
 
 # o2r-meta
@@ -57,12 +59,6 @@ ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
 ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
 RUN echo $(git rev-parse --short HEAD) >> version
 
-RUN apk del \
-    git \
-    wget \
-    ca-certificates \
-  && rm -rf /var/cache
-
 # Install app
 WORKDIR /loader
 COPY config config
@@ -72,6 +68,14 @@ COPY index.js index.js
 COPY package.json package.json
 
 RUN npm install --production
+
+# Clean up
+RUN apk del \
+    git \
+    wget \
+    make \
+    ca-certificates \
+  && rm -rf /var/cache
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["npm", "start" ]
