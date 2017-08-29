@@ -39,6 +39,31 @@ The configuration can be done via environment variables.
   Path to extraction mappings, defaults to `../o2r-meta/broker/mappings`. You will very likely need to change this.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
+- `SLACK_BOT_TOKEN`
+  Authentication token for a bot app on Slack. See section [Slack bot](#slack-bot).
+- `SLACK_VERIFICATION_TOKEN`
+  Token provided by Slack for interative messages and events, to be used to verify that requests are actually coming from Slack.
+- `SLACK_CHANNEL_STATUS`
+  Channel to post status messages to, defaults to `#monitoring`.
+- `SLACK_CHANNEL_LOAD`
+  Channel to post messages related to (up)loading to, defaults to `#monitoring`.
+
+## Slack bot
+
+Documentation of Slack API: https://api.slack.com/bot-users, especially [interactive messages](https://api.slack.com/interactive-messages).
+
+The bot needs the permissions to join channels and post to them.
+Add the following scopes to the app in the section "OAuth & Permissions" in the bot's apps page.
+
+- `channels:write`
+- `chat:write:bot`
+- `bot`
+
+While adding the app to your Slack organisation, make sure to allow the bot to post the the desired channel.
+
+### Local bot development
+
+Start ngrok with `ngrok http 8088` and enter the public endpoint pointing to your local server at https://api.slack.com/apps/A6J6CDLQK/interactive-messages. ngrok also has a useful web interface at http://127.0.0.1:4040/inspect/http on all incoming requests.
 
 ## Development
 

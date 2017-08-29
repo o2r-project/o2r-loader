@@ -16,7 +16,7 @@
  */
 
 // General modules
-var c = require('../config/config');
+var config = require('../config/config');
 var debug = require('debug')('loader:ctrl:dispatch');
 
 // load controllers
@@ -34,7 +34,7 @@ exports.dispatch = (req, res) => {
     res.status(401).send('{"error":"user is not authenticated"}');
     return;
   }
-  if (req.user.level < c.user.level.create_compendium) {
+  if (req.user.level < config.user.level.create_compendium) {
     res.status(401).send('{"error":"user level does not allow compendium creation"}');
     return;
   }

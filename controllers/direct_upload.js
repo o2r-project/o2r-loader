@@ -16,9 +16,10 @@
  */
 
 // General modules
-var c = require('../config/config');
+const config = require('../config/config');
 var debug = require('debug')('loader:ctrl:directupload');
-var fs = require('fs');
+const fs = require('fs');
+const slackBot = require('../lib/slack');
 
 var Compendium = require('../lib/model/compendium');
 var Uploader = require('../lib/uploader').Uploader;
@@ -26,7 +27,7 @@ var Uploader = require('../lib/uploader').Uploader;
 exports.create = (req, res) => {
   if (req.body.content_type === 'compendium_v1') {
     debug('Creating new %s for user %s (original file name: %s)',
-      req.body.content_type, req.user.id, req.file.originalname);
+      req.body.content_type, req.user.orcid, req.file.originalname);
 
     var uploader = new Uploader(req, res);
     uploader.upload((id, err) => {
@@ -35,6 +36,11 @@ exports.create = (req, res) => {
       }
       else {
         debug('New compendium %s successfully uploaded', id);
+
+        if (config.slack.enable) {
+          let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + id;
+          slackBot.newDirectUpload(compendium_url, req.user.orcid);
+        }
       }
     });
   } else {

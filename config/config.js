@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 o2r project.
+ * (C) Copyright 2017 o2r project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,5 +110,14 @@ c.zenodo.default_host = 'sandbox.zenodo.org';
 // base urls for Zenodo and Zenodo sandbox
 c.zenodo.zenodo_sandbox_url = 'https://sandbox.zenodo.org/';
 c.zenodo.zenodo_url = 'https://zenodo.org/';
+
+// Slack
+c.slack = {};
+c.slack.enable = true;
+c.slack.bot_token = process.env.SLACK_BOT_TOKEN;
+c.slack.verification_token = process.env.SLACK_VERIFICATION_TOKEN;
+c.slack.channel = {};
+c.slack.channel.status = process.env.SLACK_CHANNEL_STATUS || '#monitoring';
+c.slack.channel.loadEvents = process.env.SLACK_CHANNEL_LOAD ||'#monitoring';
 
 module.exports = c;
