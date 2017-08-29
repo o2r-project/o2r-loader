@@ -38,6 +38,7 @@ RUN apk add --no-cache --update\
     openssl \
     ca-certificates \
     dumb-init \
+    make \
   && pip install bagit \
   && git clone --depth 1 -b master https://github.com/o2r-project/o2r-loader /loader
 
@@ -58,15 +59,17 @@ ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
 ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
 RUN echo $(git rev-parse --short HEAD) >> version
 
-RUN apk del \
-    git \
-    wget \
-    ca-certificates \
-  && rm -rf /var/cache
-
 # Install app
 WORKDIR /loader
 RUN npm install --production
+
+# Clean up
+RUN apk del \
+    git \
+    wget \
+    make \
+    ca-certificates \
+  && rm -rf /var/cache
 
 # Metadata params provided with docker build command
 ARG VERSION=dev
