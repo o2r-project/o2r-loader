@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 o2r project
+ * (C) Copyright 2017 o2r project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,5 @@ function createCompendiumPostRequest(path, cookie) {
 
   return (reqParams);
 }
-
 
 module.exports.createCompendiumPostRequest = createCompendiumPostRequest;

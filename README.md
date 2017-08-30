@@ -104,4 +104,4 @@ The file `Dockerfile` describes the Docker image published at [Docker Hub](https
 
 o2r-loader is licensed under Apache License, Version 2.0, see file LICENSE.
 
-Copyright (C) 2016 - o2r project.
+Copyright (C) 2017 - o2r project.
