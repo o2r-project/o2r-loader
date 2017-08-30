@@ -165,12 +165,14 @@ function initApp(callback) {
       });
     }
 
-    app.listen(config.net.port, () => {
+    const server = app.listen(config.net.port, () => {
       debug('loader %s with API version %s waiting for requests on port %s',
         config.version,
         config.api_version,
         config.net.port);
     });
+
+    server.timeout = 1000 * config.upload.timeout_seconds;
   } catch (err) {
     callback(err);
   }

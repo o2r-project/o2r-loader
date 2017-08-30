@@ -50,6 +50,9 @@ c.id_length = 5; // length of compendium ids [0-9,a-z,A-Z]
 // session secret
 c.sessionsecret = env.SESSION_SECRET || 'o2r';
 
+c.upload = {};
+c.upload.timeout_seconds = 60 * 30; // 30 minutes
+
 // authentication levels
 c.user = {};
 c.user.level = {};
