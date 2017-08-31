@@ -1,4 +1,4 @@
-# (C) Copyright 2016 The o2r project. https://o2r.info
+# (C) Copyright 2017 o2r project. https://o2r.info
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM alpine:3.6
+FROM node:8-alpine
+
+# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
+RUN echo \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 
 # Python, based on frolvlad/alpine-python3
 RUN apk add --no-cache \
@@ -23,23 +29,15 @@ RUN apk add --no-cache \
   && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
   && rm -r /root/.cache
 
-# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
-RUN echo \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
-
-RUN apk add --no-cache --update\
+RUN apk add --no-cache \
     git \
+    make \
     wget \
     unzip \
-    nodejs \
-    nodejs-npm \
     openssl \
-    ca-certificates \
     dumb-init \
-    make \
-  && pip install bagit \
+    ca-certificates \
+  && pip3 install bagit \
   && git clone --depth 1 -b master https://github.com/o2r-project/o2r-loader /loader
 
 # o2r-meta
@@ -54,7 +52,7 @@ RUN apk add --no-cache \
     py-gdal \
   && git clone --depth 1 -b master https://github.com/o2r-project/o2r-meta.git /meta
 WORKDIR /meta
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
 ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
 RUN echo $(git rev-parse --short HEAD) >> version

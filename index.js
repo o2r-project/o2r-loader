@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 o2r project.
+ * (C) Copyright 2017 o2r project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,13 @@ fse.mkdirsSync(config.fs.base);
 fse.mkdirsSync(config.fs.incoming);
 fse.mkdirsSync(config.fs.compendium);
 
+// use ES6 promises for mongoose
+mongoose.Promise = global.Promise;
 const dbURI = config.mongo.location + config.mongo.database;
-mongoose.connect(dbURI);
+mongoose.connect(dbURI, {
+  useMongoClient: true,
+  promiseLibrary: global.Promise // use ES6 promises for underlying MongoDB DRIVE
+});
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);
 });
@@ -59,6 +64,8 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const dispatch = require('./controllers/dispatch').dispatch;
+
+const slackbot = require('./lib/slack');
 
 /*
  *  Authentication & Authorization
@@ -91,7 +98,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     let id = randomstring.generate(config.id_length);
-    debug('Generated id "%s" for user file %s of fieldname %s', id, file.originalname, file.fieldname);
+    debug('Generated id "%s" for file %s from fieldname %s', id, file.originalname, file.fieldname);
     cb(null, id);
   }
 });
@@ -131,7 +138,7 @@ function initApp(callback) {
      * configure routes
      */
     app.post('/api/v1/compendium', upload.single('compendium'), dispatch);
-    
+
     app.get('/status', function (req, res) {
       res.setHeader('Content-Type', 'application/json');
       if (!req.isAuthenticated() || req.user.level < config.user.level.view_status) {
@@ -149,12 +156,23 @@ function initApp(callback) {
       res.send(response);
     });
 
-    app.listen(config.net.port, () => {
+    if (config.slack.enable) {
+      slackbot.start((err) => {
+        debug('Error starting slackbot (disabling it now): %s', err);
+        config.slack.enable = false;
+      }, (done) => {
+        debug('Slack bot enabled and configured - nice! %s', JSON.stringify(done));
+      });
+    }
+
+    const server = app.listen(config.net.port, () => {
       debug('loader %s with API version %s waiting for requests on port %s',
         config.version,
         config.api_version,
         config.net.port);
     });
+
+    server.timeout = 1000 * config.upload.timeout_seconds;
   } catch (err) {
     callback(err);
   }
@@ -174,7 +192,10 @@ dbBackoff.on('backoff', function (number, delay) {
 });
 dbBackoff.on('ready', function (number, delay) {
   debug('Connect to MongoDB (#%s)', number, delay);
-  mongoose.createConnection(dbURI, (err) => {
+  mongoose.connect(dbURI, {
+    useMongoClient: true,
+    promiseLibrary: global.Promise
+  }, (err) => {
     if (err) {
       debug('Error during connect: %s', err);
       mongoose.disconnect(() => {

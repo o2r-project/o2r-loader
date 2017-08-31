@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 o2r project
+ * (C) Copyright 2017 o2r project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
  */
 
 // General modules
-var c = require('../config/config');
-var debug = require('debug')('loader:ctrl:share');
-var fs = require('fs');
+const config = require('../config/config');
+const debug = require('debug')('loader:ctrl:share');
+const fs = require('fs');
 
-var Compendium = require('../lib/model/compendium');
-var Loader = require('../lib/loader').Loader;
+const Compendium = require('../lib/model/compendium');
+const Loader = require('../lib/loader').Loader;
 
-var url = require('url');
-var validator = require('validator');
-
+const url = require('url');
+const validator = require('validator');
+const slackBot = require('../lib/slack');
 
 exports.create = (req, res) => {
   req.params = {};
@@ -50,7 +50,7 @@ exports.create = (req, res) => {
       return;
     }
 
-    req.params.zenodoHost = c.zenodo.default_host;
+    req.params.zenodoHost = config.zenodo.default_host;
     prepareZenodoLoad(req, res);
     return;
   }
@@ -63,16 +63,16 @@ exports.create = (req, res) => {
       return;
     }
     req.params.zenodoID = req.body.zenodo_record_id;
-    req.params.zenodoHost = c.zenodo.default_host;
+    req.params.zenodoHost = config.zenodo.default_host;
     prepareZenodoLoad(req, res);
     return;
   }
 
   // validate share_url
-  if(!validator.isURL(req.body.share_url)) {
-      debug('Invalid share_url:', req.body.share_url);
-      res.status(422).send('{"error":"public share URL is invalid"}');
-      return;
+  if (!validator.isURL(req.body.share_url)) {
+    debug('Invalid share_url:', req.body.share_url);
+    res.status(422).send('{"error":"public share URL is invalid"}');
+    return;
   }
 
   // get top-level hostname from share_url
@@ -81,7 +81,7 @@ exports.create = (req, res) => {
   hostname = hostname[hostname.length - 2];
 
   //depending on the host, start zenodo loader or sciebo/owncloud loader
-  switch(hostname) {
+  switch (hostname) {
     case 'sciebo':
       prepareScieboLoad(req, res);
       break;
@@ -96,15 +96,15 @@ exports.create = (req, res) => {
     case 'doi':
       // get zenodoID from DOI URL, e.g. https://doi.org/10.5281/zenodo.268443
       req.params.zenodoID = parsedURL.path.split('zenodo.')[1];
-      req.params.zenodoHost = c.zenodo.default_host; //Use default host from config
+      req.params.zenodoHost = config.zenodo.default_host; //Use default host from config
       prepareZenodoLoad(req, res);
       break;
     default:
       debug('Public share host "%s" is not allowed.', hostname);
       res.status(403).send('{"error":"host is not allowed"}');
-      debug('public share host is not allowed, supported is: %s', c.webdav.allowedHosts.toString());
+      debug('public share host is not allowed, supported is: %s', config.webdav.allowedHosts.toString());
       return;
-  } 
+  }
 };
 
 function prepareScieboLoad(req, res) {
@@ -117,19 +117,24 @@ function prepareScieboLoad(req, res) {
   let hostname = validURL.hostname.split('.');
   hostname = hostname[hostname.length - 2];
 
-  if (c.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
+  if (config.webdav.allowedHosts.indexOf(hostname) === -1) { //if hostname is not in allowedHosts
     debug('Public share host "%s" is not allowed.', hostname);
     res.status(403).send('{"error":"public share host is not allowed"}');
-    debug('public share host is not allowed, supported is: %s', c.webdav.allowedHosts.toString());
+    debug('public share host is not allowed, supported is: %s', config.webdav.allowedHosts.toString());
     return;
   }
 
   var loader = new Loader(req, res);
-  loader.loadOwncloud((id, err) => {
+  loader.loadOwncloud((data, err) => {
     if (err) {
       debug('Error during public share load: %s', err.message);
     } else {
-      debug('New compendium %s successfully loaded', id);
+      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+
+      if (config.slack.enable) {
+        let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;
+        slackBot.newShareUpload(compendium_url, req.user.orcid, data.share_url);
+      }
     }
   });
 }
@@ -138,10 +143,10 @@ function prepareZenodoLoad(req, res) {
   //validate host (must be zenodo or sandbox.zenodo)
   switch (req.params.zenodoHost) {
     case 'sandbox.zenodo.org':
-      req.params.baseURL = c.zenodo.zenodo_sandbox_url;
+      req.params.baseURL = config.zenodo.zenodo_sandbox_url;
       break;
     case 'zenodo.org':
-      req.params.baseURL = c.zenodo.zenodo_url;
+      req.params.baseURL = config.zenodo.zenodo_url;
       break;
     default:
       debug('Invalid hostname:', req.params.zenodoHost);
@@ -150,18 +155,23 @@ function prepareZenodoLoad(req, res) {
   }
 
   // validate zenodoID
-  if (!validator.isNumeric(String(req.params.zenodoID))){
+  if (!validator.isNumeric(String(req.params.zenodoID))) {
     debug('Invalid zenodoID:', req.params.zenodoID);
     res.status(422).send('{"error":"zenodo ID is not a number"}');
     return;
   }
 
   var loader = new Loader(req, res);
-  loader.loadZenodo((id, err) => {
+  loader.loadZenodo((data, err) => {
     if (err) {
-      debug('Error during zenodo load: %s', err.message);
+      debug('Error during public share load: %s', err.message);
     } else {
-      debug('New compendium %s successfully loaded', id);
+      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+
+      if (config.slack.enable) {
+        let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;
+        slackBot.newShareUpload(compendium_url, req.user.orcid, data.share_url);
+      }
     }
   });
 }
