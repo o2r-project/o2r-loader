@@ -65,6 +65,12 @@ While adding the app to your Slack organisation, make sure to allow the bot to p
 
 Start ngrok with `ngrok http 8088` and enter the public endpoint pointing to your local server at https://api.slack.com/apps/A6J6CDLQK/interactive-messages. ngrok also has a useful web interface at http://127.0.0.1:4040/inspect/http on all incoming requests.
 
+## Supported encodings
+
+The upload process may fail if certain files with unsupported encoding are detected: 
+
+The encoding of text files analyzed by the o2r metadata extraction tool [o2r-meta](https://github.com/o2r-project/o2r-meta) must be Unicode (`UTF-8`, `UTF-16BE`, ...) or Unicode compatible (e.g. `ISO-8859-1`). The supported encodings and the list of files checked can be configured in `config.js`. 
+
 ## Development
 
 ### Steps for manual local development
