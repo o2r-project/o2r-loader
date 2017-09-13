@@ -1,5 +1,7 @@
 # o2r-loader
 
+[![](https://images.microbadger.com/badges/image/o2rproject/o2r-loader.svg)](https://microbadger.com/images/o2rproject/o2r-loader "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/o2rproject/o2r-loader.svg)](https://microbadger.com/images/o2rproject/o2r-loader "Get your own version badge on microbadger.com")
+
 Node.js implementation to load compendia from third party repositories and handle direct user uploads for the [o2r web api](http://o2r.info/o2r-web-api).
 
 Currently, it implements the endpoint `/api/v1/compendium`.
@@ -87,7 +89,7 @@ Then start the loader in your IDE or in a new terminal.
 
 ## Testing
 
-Tests found in the file `api.js` can be started using mocha:
+Tests can be started using mocha:
 
 ```bash
 npm install
