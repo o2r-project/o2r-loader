@@ -24,7 +24,6 @@ function createCompendiumPostRequest(path, cookie) {
   var zip = new AdmZip();
   zip.addLocalFolder(path);
   var tmpfile = tmp.tmpNameSync() + '.zip';
-  //var zipBuffer = zip.toBuffer(); could not make buffer work with multipart/form
   zip.writeZip(tmpfile);
 
   let formData = {
@@ -32,7 +31,7 @@ function createCompendiumPostRequest(path, cookie) {
     'compendium': {
       value: fs.createReadStream(tmpfile),
       options: {
-        filename: 'another.zip',
+        filename: 'compendium.zip',
         contentType: 'application/zip'
       }
     }

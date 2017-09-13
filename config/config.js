@@ -43,7 +43,7 @@ if (c.mongo.location[c.mongo.location.length-1] !== '/') {
 c.fs.base       = env.LOADER_BASEPATH || '/tmp/o2r/';
 c.fs.incoming   = c.fs.base + 'incoming/';
 c.fs.compendium = c.fs.base + 'compendium/';
-c.fs.delete_inc = true;
+c.fs.keepIncomingArchive = false;
 
 c.id_length = 5; // length of compendium ids [0-9,a-z,A-Z]
 
@@ -65,15 +65,16 @@ c.bagtainer.payloadDirectory = '/data';
 c.bagtainer.configFile = '/data/bagtainer.yml';
 c.bagtainer.keepContainers = false; // set this to true for debugging runtime options
 c.bagtainer.keepImages = true; // required for image download!
-c.bagtainer.validateBeforeExecute = true; // cannot validate before execute when saving image tarball but not updating the bag
+c.bagtainer.validateBeforeExecute = false; // cannot validate before execute when saving image tarball but not updating the bag
+c.bagtainer.imageNamePrefix = 'bagtainer:';
+c.bagtainer.forceImageRemoval = true;
 
 c.bagtainer.bagit = {};
+c.bagtainer.bagit.detectionFileName = 'bagit.txt';
 c.bagtainer.bagit.validateFast = false;
 c.bagtainer.bagit.failOnValidationError= {};
 c.bagtainer.bagit.failOnValidationError.upload = false;
 c.bagtainer.bagit.failOnValidationError.execute = false;
-c.bagtainer.imageNamePrefix = 'bagtainer:';
-c.bagtainer.forceImageRemoval = true;
 
 // metadata extraction and brokering options
 c.meta = {};

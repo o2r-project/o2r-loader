@@ -213,7 +213,6 @@ dbBackoff.on('ready', function (number, delay) {
           });
           dbBackoff.backoff();
         }
-        debug('Started application.');
       });
     }
   });
