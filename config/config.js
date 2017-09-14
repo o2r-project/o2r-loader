@@ -60,6 +60,8 @@ c.user.level.create_compendium = 100;
 
 // bagtainer configuration
 c.bagtainer = {};
+c.bagtainer.supportedContentTypes = ["compendium", "workspace"];
+c.bagtainer.detectionFileName = 'erc.yml';
 c.bagtainer.supportedVersions = ['0.1', '1'];
 c.bagtainer.payloadDirectory = '/data';
 c.bagtainer.configFile = '/data/bagtainer.yml';

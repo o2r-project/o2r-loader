@@ -20,14 +20,14 @@ const tmp = require('tmp');
 const AdmZip = require('adm-zip');
 const fs = require('fs');
 
-function createCompendiumPostRequest(path, cookie) {
+function createCompendiumPostRequest(path, cookie, type = 'compendium') {
   var zip = new AdmZip();
   zip.addLocalFolder(path);
   var tmpfile = tmp.tmpNameSync() + '.zip';
   zip.writeZip(tmpfile);
 
   let formData = {
-    'content_type': 'compendium_v1',
+    'content_type': type,
     'compendium': {
       value: fs.createReadStream(tmpfile),
       options: {

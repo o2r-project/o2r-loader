@@ -31,9 +31,9 @@ exports.create = (req, res) => {
   req.params = {};
 
   // validate content_type
-  if (req.body.content_type !== 'compendium_v1') {
-    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
-    debug('Provided content_type "%s" not implemented', req.body.content_type);
+  if (!config.bagtainer.supportedContentTypes.includes(req.body.content_type)) {
+    res.status(400).send('Provided content_type not implemented, only %s supported.', JSON.stringify(config.bagtainer.supportedContentTypes));
+    debug('content_type "%s" not supported', req.body.content_type);
     return;
   }
 

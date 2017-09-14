@@ -30,10 +30,15 @@ fse.mkdirsSync(config.fs.compendium);
 // use ES6 promises for mongoose
 mongoose.Promise = global.Promise;
 const dbURI = config.mongo.location + config.mongo.database;
-mongoose.connect(dbURI, {
+var dbOptions = {
+  server: {
+    auto_reconnect: true,
+    reconnectTries: Number.MAX_VALUE,
+    socketOptions: { keepAlive: 30000, connectTimeoutMS: 30000, autoReconnect: true }
+  },
   useMongoClient: true,
-  promiseLibrary: global.Promise // use ES6 promises for underlying MongoDB DRIVE
-});
+  promiseLibrary: mongoose.Promise
+};
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);
 });
@@ -192,10 +197,7 @@ dbBackoff.on('backoff', function (number, delay) {
 });
 dbBackoff.on('ready', function (number, delay) {
   debug('Connect to MongoDB (#%s)', number, delay);
-  mongoose.connect(dbURI, {
-    useMongoClient: true,
-    promiseLibrary: global.Promise
-  }, (err) => {
+  mongoose.connect(dbURI, dbOptions, (err) => {
     if (err) {
       debug('Error during connect: %s', err);
       mongoose.disconnect(() => {

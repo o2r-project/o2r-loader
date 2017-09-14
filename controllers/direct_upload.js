@@ -25,7 +25,14 @@ var Compendium = require('../lib/model/compendium');
 var Uploader = require('../lib/uploader').Uploader;
 
 exports.create = (req, res) => {
-  if (req.body.content_type === 'compendium_v1') {
+  // validate content_type
+  if (!config.bagtainer.supportedContentTypes.includes(req.body.content_type)) {
+    debug('content_type "%s" not supported', req.body.content_type);
+    res.status(400).send({'error': 'Provided content_type not implemented, only ' + JSON.stringify(config.bagtainer.supportedContentTypes) + ' supported.'});
+    return;
+  }
+
+  if (req.body.content_type === 'compendium' || req.body.content_type === 'workspace') {
     debug('Creating new %s for user %s (original file name: %s)',
       req.body.content_type, req.user.orcid, req.file.originalname);
 
@@ -44,7 +51,7 @@ exports.create = (req, res) => {
       }
     });
   } else {
-    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
+    res.status(400).send('Provided content_type not supported.');
     debug('Provided content_type "%s" not implemented', req.body.content_type);
   }
 };
