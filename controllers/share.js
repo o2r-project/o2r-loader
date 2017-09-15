@@ -32,7 +32,7 @@ exports.create = (req, res) => {
 
   // validate content_type
   if (!config.bagtainer.supportedContentTypes.includes(req.body.content_type)) {
-    res.status(400).send('Provided content_type not implemented, only %s supported.', JSON.stringify(config.bagtainer.supportedContentTypes));
+    res.status(400).send('Provided content_type not implemented, only ' + JSON.stringify(config.bagtainer.supportedContentTypes) + ' supported.');
     debug('content_type "%s" not supported', req.body.content_type);
     return;
   }

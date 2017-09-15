@@ -31,7 +31,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
     describe('POST /api/v1/compendium to create a new compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -44,7 +44,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
 
         it('should give a response including the id field', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -58,7 +58,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
 
         it('should give give 401 with valid JSON and error message for unauthenticated user', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
                 this.timeout(10000);
 
                 request(req, (err, res, body) => {
@@ -78,7 +78,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
 
         it('should give compendium metadata with a candidate field set to true for the uploading user', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
                 this.timeout(10000);
 
                 request(req, (err, res, body) => {
@@ -168,7 +168,7 @@ describe('Direct upload of minimal workspace (script) _with_ basedir', function 
             });
         }).timeout(10000);
 
-        it('should not contain the stripped dir in the files metadata but still hav subdir', (done) => {
+        it('should not contain the stripped dir in the files metadata but still have subdir', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-script-basedir', cookie_o2r, 'workspace');
                 this.timeout(10000);
@@ -269,12 +269,13 @@ describe('Direct upload of minimal workspace (rmd)', function () {
                 done();
             });
         });
+    });
 
+    describe('POST /api/v1/compendium to create a new compendium with different content types', () => {
         it('should respond with HTTP 400 with valid JSON and error message when using no content_type', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r);
                 delete req.formData.content_type;
-                console.log(req);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -291,7 +292,6 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, '');
                 delete req.formData.content_type;
-                console.log(req);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
@@ -308,8 +308,6 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let teststring = 'testnonexist';
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, teststring);
-                delete req.formData.content_type;
-                console.log(req);
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);

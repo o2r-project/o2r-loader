@@ -53,7 +53,6 @@ before(function () {
         }
     };
     db.sessions.save(session, function (err, doc) {
-        //console.log(doc);
         if (err) throw err;
     });
     var session_plain = {
@@ -83,7 +82,6 @@ before(function () {
         'name': 'o2r-testuser'
     };
     db.users.save(o2ruser, function (err, doc) {
-        //console.log(doc);
         if (err) throw err;
     });
     var plainuser = {
