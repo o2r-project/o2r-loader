@@ -26,9 +26,9 @@ var Uploader = require('../lib/uploader').Uploader;
 
 exports.create = (req, res) => {
   // validate content_type
-  if (!config.bagtainer.supportedContentTypes.includes(req.body.content_type)) {
+  if (!config.compendium.supportedContentTypes.includes(req.body.content_type)) {
     debug('content_type "%s" not supported', req.body.content_type);
-    res.status(400).send({ 'error': 'Provided content_type "' + req.body.content_type + '" not implemented, only ' + JSON.stringify(config.bagtainer.supportedContentTypes) + ' supported.' });
+    res.status(400).send({ 'error': 'Provided content_type "' + req.body.content_type + '" not implemented, only ' + JSON.stringify(config.compendium.supportedContentTypes) + ' supported.' });
     return;
   }
 

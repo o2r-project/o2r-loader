@@ -22,14 +22,15 @@ const config = require('../config/config');
 // test parameters for local session authentication directly via fixed database entries
 var orcid = '0000-0001-6021-1617';
 var orcid_plain = '0000-0000-0000-0001';
+var orcid_admin = '4242-0000-0000-4242';
 
 var sessionId = 'C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo';
 var sessionId_plain = 'yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq';
-
+var sessionId_admin = 'hJRjapOTVCEvlMYCb8BXovAOi2PEOC4i';
 
 var env = process.env;
-global.test_host = env.TEST_HOST ||  'http://localhost:' + config.net.port;
-global.test_host_read = env.TEST_HOST_READ ||  'http://localhost:8080';
+global.test_host = env.TEST_HOST || 'http://localhost:' + config.net.port;
+global.test_host_read = env.TEST_HOST_READ || 'http://localhost:8080';
 console.log('Testing endpoint at ' + global.test_host);
 
 before(function () {
@@ -74,6 +75,25 @@ before(function () {
     db.sessions.save(session_plain, function (err, doc) {
         if (err) throw err;
     });
+    var session_admin = {
+        '_id': sessionId_admin,
+        'session': {
+            'cookie': {
+                'originalMaxAge': null,
+                'expires': null,
+                'secure': null,
+                'httpOnly': true,
+                'domain': null,
+                'path': '/'
+            },
+            'passport': {
+                'user': orcid_admin
+            }
+        }
+    }
+    db.sessions.save(session_admin, function (err, doc) {
+        if (err) throw err;
+    });
 
     var o2ruser = {
         '_id': '57dc171b8760d15dc1864044',
@@ -91,6 +111,15 @@ before(function () {
         'name': 'plain-testuser'
     };
     db.users.save(plainuser, function (err, doc) {
+        if (err) throw err;
+    });
+    var adminuser = {
+        '_id': '5887181ebd95ff5ae8febb88',
+        'orcid': orcid_admin,
+        'level': 1000,
+        'name': 'admin'
+    };
+    db.users.save(adminuser, function (err, doc) {
         if (err) throw err;
     });
 

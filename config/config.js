@@ -58,25 +58,18 @@ c.user = {};
 c.user.level = {};
 c.user.level.create_compendium = 100;
 
-// bagtainer configuration
-c.bagtainer = {};
-c.bagtainer.supportedContentTypes = ["compendium", "workspace"];
-c.bagtainer.detectionFileName = 'erc.yml';
-c.bagtainer.supportedVersions = ['0.1', '1'];
-c.bagtainer.payloadDirectory = '/data';
-c.bagtainer.configFile = '/data/bagtainer.yml';
-c.bagtainer.keepContainers = false; // set this to true for debugging runtime options
-c.bagtainer.keepImages = true; // required for image download!
-c.bagtainer.validateBeforeExecute = false; // cannot validate before execute when saving image tarball but not updating the bag
-c.bagtainer.imageNamePrefix = 'bagtainer:';
-c.bagtainer.forceImageRemoval = true;
+// compendium configuration
+c.compendium = {};
+c.compendium.supportedContentTypes = ["compendium", "workspace"];
+c.compendium.detectionFileName = 'erc.yml';
+c.compendium.supportedVersions = ['0.1', '1'];
 
-c.bagtainer.bagit = {};
-c.bagtainer.bagit.detectionFileName = 'bagit.txt';
-c.bagtainer.bagit.validateFast = false;
-c.bagtainer.bagit.failOnValidationError= {};
-c.bagtainer.bagit.failOnValidationError.upload = false;
-c.bagtainer.bagit.failOnValidationError.execute = false;
+c.bagit = {};
+c.bagit.detectionFileName = 'bagit.txt';
+c.bagit.payloadDirectory = 'data';
+c.bagit.validation = {};
+c.bagit.validation.fast = false;
+c.bagit.validation.failUpload = true;
 
 // metadata extraction and brokering options
 c.meta = {};
@@ -88,6 +81,7 @@ c.meta.extract.outputDir = '.erc';
 c.meta.extract.targetElement = 'o2r';
 c.meta.extract.bestCandidateFile = 'metadata_raw.json';
 c.meta.extract.failOnNoMetadata = false;
+c.meta.extract.stayOffline = true;
 
 c.meta.broker = {};
 c.meta.broker.enable = true;

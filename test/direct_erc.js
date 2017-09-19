@@ -31,7 +31,7 @@ describe('Direct upload of ERC', function () {
     describe('POST /api/v1/compendium response with executable ERC', () => {
         before(function (done) {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
-            this.timeout(10000);
+            this.timeout(requestLoadingTimeout);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -49,7 +49,7 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
 
         it('should respond with valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -61,7 +61,7 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
 
         it('should give a response including the id field', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -74,11 +74,24 @@ describe('Direct upload of ERC', function () {
                     done();
                 });
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
+
+
+        it('should contain brokered metadata to o2r (if asking as the uploading user)', (done) => {
+            request(get, (err, res, body) => {
+                assert.ifError(err);
+                let response = JSON.parse(body);
+                assert.property(response, 'metadata');
+                assert.property(response.metadata, 'o2r');
+                assert.property(response.metadata.o2r, 'ercIdentifier');
+                assert.property(response.metadata.o2r, 'paperSource');
+                assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
     });
 
-    // bag is not validated on upload by default anymore
-    describe.skip('POST /api/v1/compendium with invalid bag', () => {
+    describe('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
@@ -103,7 +116,7 @@ describe('Direct upload of ERC', function () {
 
     describe.skip('POST /api/v1/compendium with virus', () => {
         it('upload compendium should fail and return an error message about infected files', (done) => {
-            let req = createCompendiumPostRequest('./test/bagtainers/virustainer', cookie);
+            let req = createCompendiumPostRequest('./test/erc/virustainer', cookie);
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 422);
