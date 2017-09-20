@@ -40,8 +40,8 @@ describe('Metadata brokering during upload of ERC ', function () {
 
         before(function (done) {
             let req = createCompendiumPostRequest('./test/erc/with_metadata', cookie_o2r);
-            this.timeout(10000);
-            req.timeout = 10000;
+            this.timeout(20000);
+            req.timeout = 20000;
 
             request(req, (err, res, body) => {
                 assert.ifError(err);

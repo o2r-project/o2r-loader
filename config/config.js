@@ -91,6 +91,10 @@ c.meta.broker.mappings = {
     targetElement: 'zenodo.metadata',
     file: 'zenodo-map.json'
   },
+  o2r: {
+    targetElement: 'o2r',
+    file: 'o2r-map.json'
+  },
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
 

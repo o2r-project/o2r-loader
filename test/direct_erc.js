@@ -29,64 +29,72 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 
 describe('Direct upload of ERC', function () {
     describe('POST /api/v1/compendium response with executable ERC', () => {
-        before(function (done) {
+        it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
-            this.timeout(requestLoadingTimeout);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
+                assert.equal(res.statusCode, 200);
                 done();
             });
-        });
+        }).timeout(requestLoadingTimeout);
 
-        it('should respond with HTTP 200 OK', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+        it('should respond with HTTP 200 OK when using upload type "compendium" explicitly', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r, 'compendium');
 
-                request(req, (err, res, body) => {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 200);
-                    done();
-                });
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                done();
             });
         }).timeout(requestLoadingTimeout);
 
         it('should respond with valid JSON', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-                request(req, (err, res, body) => {
-                    assert.ifError(err);
-                    assert.isObject(JSON.parse(body), 'returned JSON');
-                    done();
-                });
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                done();
             });
         }).timeout(requestLoadingTimeout);
 
         it('should give a response including the id field', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-                request(req, (err, res, body) => {
-                    assert.ifError(err);
-                    assert.isDefined(JSON.parse(body).id, 'returned id');
-                    assert.property(JSON.parse(body), 'id');
-                    done();
-                });
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                assert.property(JSON.parse(body), 'id');
+                done();
             });
         }).timeout(requestLoadingTimeout);
 
+        it('should contain brokered metadata for o2r metadata section (if asking as the uploading user)', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-        it('should contain brokered metadata to o2r (if asking as the uploading user)', (done) => {
-            request(get, (err, res, body) => {
+            request(req, (err, res, body) => {
                 assert.ifError(err);
-                let response = JSON.parse(body);
-                assert.property(response, 'metadata');
-                assert.property(response.metadata, 'o2r');
-                assert.property(response.metadata.o2r, 'ercIdentifier');
-                assert.property(response.metadata.o2r, 'paperSource');
-                assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
-                done();
+
+                let j = request.jar();
+                let ck = request.cookie('connect.sid=' + cookie_o2r);
+                j.setCookie(ck, global.test_host);
+                let get = {
+                    method: 'GET',
+                    jar: j,
+                    uri: global.test_host_read + '/api/v1/compendium/' + JSON.parse(body).id
+                };
+
+                request(get, (err, res, body) => {
+                    assert.ifError(err);
+                    let response = JSON.parse(body);
+                    assert.property(response, 'metadata');
+                    assert.property(response.metadata, 'o2r');
+                    assert.property(response.metadata.o2r, 'ercIdentifier');
+                    //assert.propertyVal(response.metadata.o2r, 'ercIdentifier', 'KIbebWnPlx');
+                    //assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
+                    done();
+                });
             });
         }).timeout(requestLoadingTimeout);
     });

@@ -144,6 +144,23 @@ describe('Direct upload of minimal workspace (script) _with_ basedir', function 
 
 describe('Direct upload of minimal workspace (rmd)', function () {
     describe('POST /api/v1/compendium to create a new compendium', () => {
+        it('should respond with HTTP 200 OK and valid JSON, including the ID field', (done) => {
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, 'workspace');
+
+                request(req, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+                    assert.isObject(response, 'returned JSON');
+                    assert.property(response, 'id');
+                    done();
+                });
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+
+    describe('POST /api/v1/compendium processing result', () => {
         let compendium_id = '';
 
         let j = request.jar();
@@ -155,26 +172,23 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             timeout: 10000
         };
 
-        it('should respond with HTTP 200 OK and valid JSON, including the ID field', (done) => {
+        before(function (done) {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                this.timeout(requestLoadingTimeout);
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, 'workspace');
 
                 request(req, (err, res, body) => {
                     assert.ifError(err);
                     assert.equal(res.statusCode, 200);
                     let response = JSON.parse(body);
-                    assert.isObject(response, 'returned JSON');
-                    assert.property(response, 'id');
-
                     compendium_id = response.id;
                     get.uri = global.test_host_read + '/api/v1/compendium/' + compendium_id;
-
                     done();
                 });
             });
-        }).timeout(10000);
+        });
 
-        it('should have the extracted metadata from the header in the compendium metadata (if accesses as the uploading user)', (done) => {
+        it('should have the extracted metadata from the header in the compendium metadata (if accessed as the uploading user)', (done) => {
             request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
@@ -182,7 +196,8 @@ describe('Direct upload of minimal workspace (rmd)', function () {
                 assert.propertyVal(response.metadata.o2r, 'title', 'Capacity of container ships in seaborne trade from 1980 to 2016 (in million dwt)*');
                 assert.propertyVal(response.metadata.o2r, 'description', 'Capacity of container ships in seaborne trade of the world container ship fleet.\n');
                 assert.equal(response.metadata.o2r.author.length, 1);
-                assert.propertyVal(response.metadata.o2r.author[0], 'orcid', '0000-0001-9575-6780');
+                assert.propertyVal(response.metadata.o2r.author[0], 'affiliation', 'o2r team');
+                assert.propertyVal(response.metadata.o2r, 'paperSource', 'main.Rmd'); // if this breaks, the skipped test below can be updated
 
                 done();
             });
