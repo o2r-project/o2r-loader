@@ -27,14 +27,13 @@ const requestLoadingTimeout = 20000;
 
 
 describe('Sciebo loader', function () {
-
-    var compendium_id = '';
+    let compendium_id = '';
 
     describe('create new compendium based on public WebDAV', () => {
         it('public share with bagit.txt: should respond with a compendium ID', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -61,7 +60,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/9R3P3xDe9K4ClmG',
                 path: '/',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -88,7 +87,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/pnKnjIjas9bZgbB',
                 path: '/',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -114,7 +113,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/tY6I8NrDxTeXG85',
                 path: '/',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -142,7 +141,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
                 path: '/',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -168,7 +167,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://myowncloud.wxyz/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -194,7 +193,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
                 path: '/',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -220,7 +219,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -246,7 +245,7 @@ describe('Sciebo loader', function () {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();

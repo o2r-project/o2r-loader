@@ -200,7 +200,7 @@ describe('Direct upload of invalid files', function () {
         });
     });
 
-    describe.only('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
+    describe('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
         it('should respond with HTTP 422 error', (done) => {
             let formData = {
                 'content_type': 'compendium',

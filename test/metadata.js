@@ -61,6 +61,8 @@ describe('Metadata brokering during upload of ERC ', function () {
                 assert.property(response.metadata.zenodo.metadata, 'upload_type');
                 assert.property(response.metadata.zenodo.metadata, 'title');
                 assert.property(response.metadata.zenodo.metadata, 'description');
+                assert.property(response.metadata.zenodo.metadata, 'access_right');
+                assert.property(response.metadata.zenodo.metadata, 'license');
                 done();
             });
         }).timeout(requestLoadingTimeout);
