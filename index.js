@@ -20,6 +20,7 @@ config.version = require('./package.json').version;
 const debug = require('debug')('loader');
 const mongoose = require('mongoose');
 const backoff = require('backoff');
+const exec = require('child_process').exec;
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
@@ -169,6 +170,21 @@ function initApp(callback) {
         debug('Slack bot enabled and configured - nice! %s', JSON.stringify(done));
       });
     }
+
+    let pythonVersionCmd = 'echo ';
+    if (config.meta.cliPath.toLowerCase().startsWith('python')) {
+      pythonVersionCmd = pythonVersionCmd.concat('$(', config.meta.cliPath.split(" ")[0], ' --version)');
+    } else {
+      pythonVersionCmd = pythonVersionCmd.concat('$(python --version)')
+    }
+    exec(pythonVersionCmd, (error, stdout, stderr) => {
+      if (error) {
+        debug('Error detecting python version: %s', error);
+      } else {
+        let version = stdout.concat(stderr);
+        debug('Using "%s" for meta tools at "%s"', version.trim(), config.meta.cliPath);
+      }
+    });
 
     const server = app.listen(config.net.port, () => {
       debug('loader %s with API version %s waiting for requests on port %s',
