@@ -35,7 +35,10 @@ const dbURI = config.mongo.location + config.mongo.database;
 var dbOptions = {
   autoReconnect: true,
   reconnectTries: Number.MAX_VALUE,
-  socketOptions: { keepAlive: 30000, connectTimeoutMS: 30000, autoReconnect: true }
+  keepAlive: 30000,
+  socketTimeoutMS: 30000,
+  useMongoClient: true,
+  promiseLibrary: mongoose.Promise
 };
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);

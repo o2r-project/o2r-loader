@@ -35,6 +35,7 @@ before_install:
   # https://github.com/npm/npm/issues/17858
   - rm package-lock.json
   - npm i -g npm@5.4.2
+  - npm --version
 install:
   - npm install
 before_script:
