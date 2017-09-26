@@ -21,6 +21,7 @@ const debug = require('debug')('loader');
 const mongoose = require('mongoose');
 const backoff = require('backoff');
 const exec = require('child_process').exec;
+const fs = require('fs');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
@@ -32,13 +33,9 @@ fse.mkdirsSync(config.fs.compendium);
 mongoose.Promise = global.Promise;
 const dbURI = config.mongo.location + config.mongo.database;
 var dbOptions = {
-  server: {
-    auto_reconnect: true,
-    reconnectTries: Number.MAX_VALUE,
-    socketOptions: { keepAlive: 30000, connectTimeoutMS: 30000, autoReconnect: true }
-  },
-  useMongoClient: true,
-  promiseLibrary: mongoose.Promise
+  autoReconnect: true,
+  reconnectTries: Number.MAX_VALUE,
+  socketOptions: { keepAlive: 30000, connectTimeoutMS: 30000, autoReconnect: true }
 };
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);
@@ -162,6 +159,9 @@ function initApp(callback) {
       res.send(response);
     });
 
+    /*
+     * Slack configuration
+     */
     if (config.slack.enable) {
       slackbot.start((err) => {
         debug('Error starting slackbot (disabling it now): %s', err);
@@ -171,6 +171,9 @@ function initApp(callback) {
       });
     }
 
+    /*
+     * Python version and meta tools version
+     */
     let pythonVersionCmd = 'echo ';
     if (config.meta.cliPath.toLowerCase().startsWith('python')) {
       pythonVersionCmd = pythonVersionCmd.concat('$(', config.meta.cliPath.split(" ")[0], ' --version)');
@@ -185,7 +188,14 @@ function initApp(callback) {
         debug('Using "%s" for meta tools at "%s"', version.trim(), config.meta.cliPath);
       }
     });
+    let versionFile = config.meta.broker.mappings.dir.split('broker/')[0].concat(config.meta.versionFile);
+    fs.readFile(versionFile, 'utf8', function (err, data) {
+      debug('meta tools version: %s', data.trim());
+    })
 
+    /*
+     * final startup message
+     */
     const server = app.listen(config.net.port, () => {
       debug('loader %s with API version %s waiting for requests on port %s',
         config.version,

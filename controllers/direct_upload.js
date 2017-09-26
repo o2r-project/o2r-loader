@@ -32,26 +32,21 @@ exports.create = (req, res) => {
     return;
   }
 
-  if (req.body.content_type === 'compendium' || req.body.content_type === 'workspace') {
-    debug('Creating new %s for user %s (original file name: %s)',
-      req.body.content_type, req.user.orcid, req.file.originalname);
+  debug('Creating new %s for user %s (original file name: %s)',
+    req.body.content_type, req.user.orcid, req.file.originalname);
 
-    var uploader = new Uploader(req, res);
-    uploader.upload((id, err) => {
-      if (err) {
-        debug('Error during upload: %s', JSON.stringify(err));
-      }
-      else {
-        debug('New compendium %s successfully uploaded', id);
+  let uploader = new Uploader(req, res);
+  uploader.upload((id, err) => {
+    if (err) {
+      debug('Error during upload: %s', JSON.stringify(err));
+    }
+    else {
+      debug('New compendium %s successfully uploaded', id);
 
-        if (config.slack.enable) {
-          let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + id;
-          slackBot.newDirectUpload(compendium_url, req.user.orcid);
-        }
+      if (config.slack.enable) {
+        let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + id;
+        slackBot.newDirectUpload(compendium_url, req.user.orcid);
       }
-    });
-  } else {
-    res.status(400).send('Provided content_type not supported.');
-    debug('Provided content_type "%s" not implemented', req.body.content_type);
-  }
+    }
+  });
 };

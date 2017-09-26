@@ -127,7 +127,7 @@ function prepareScieboLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadOwncloud((data, err) => {
     if (err) {
-      debug('Error during public share load: %s', err.message);
+      debug('Error during public share load from owncloud: %s', JSON.stringify(err));
     } else {
       debug('New compendium successfully loaded: %s', JSON.stringify(data));
 
@@ -164,7 +164,7 @@ function prepareZenodoLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadZenodo((data, err) => {
     if (err) {
-      debug('Error during public share load: %s', err.message);
+      debug('Error during public share load from Zenodo: %s', JSON.stringify(err));
     } else {
       debug('New compendium successfully loaded: %s', JSON.stringify(data));
 

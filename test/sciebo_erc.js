@@ -26,13 +26,13 @@ const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9y
 const requestLoadingTimeout = 20000;
 
 
-describe('Sciebo loader', function () {
+describe('Sciebo loader with compendia', function () {
     let compendium_id = '';
 
-    describe('create new compendium based on public WebDAV', () => {
-        it('public share with bagit.txt: should respond with a compendium ID', (done) => {
+    describe('create new compendium based on public WebDAV share with bagit.txt', () => {
+        it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7Y7U4HC8GzJr5b9',
                 content_type: 'compendium'
             };
 
@@ -56,9 +56,51 @@ describe('Sciebo loader', function () {
             });
         }).timeout(20000);
 
-        it('public share with zip file: should respond with a compendium ID', (done) => {
+        it('should download the files in the share and make them available via API', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/9R3P3xDe9K4ClmG',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/7Y7U4HC8GzJr5b9',
+                content_type: 'compendium'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    form: form,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/data/test2.Rmd');
+                    assert.include(JSON.stringify(response), 'data/data/test.txt');
+                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+
+                    done();
+                });
+            });
+        });
+    });
+
+    describe('create new compendium based on public WebDAV share with one zip file', () => {
+        it('should respond with a compendium ID', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/oAyW77dQ1KQi1ka',
                 path: '/',
                 content_type: 'compendium'
             };
@@ -83,7 +125,79 @@ describe('Sciebo loader', function () {
             });
         }).timeout(20000);
 
-        it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
+        it('should download the files in the share and make them available via API', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/oAyW77dQ1KQi1ka',
+                content_type: 'compendium'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/document.html');
+                    assert.include(JSON.stringify(response), 'data/document.Rmd');
+                    assert.include(JSON.stringify(response), 'data/document.tex');
+
+                    done();
+                });
+            });
+        });
+    });
+
+    // not implemented yet, must be able to load specific file
+    describe.skip('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
+        it('should respond with an error', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/NSqqEdjVIjhPf0N',
+                path: '/iUaMu',
+                content_type: 'compendium'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 400);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.include(JSON.parse(body).error, 'load from share failed');
+                done();
+            });
+        }).timeout(20000);
+    });
+});
+
+describe('Sciebo loader with invalid requests', () => {
+    describe('load from public share with single directory', () => {
+        it('should throw an error and notify that the directory has no bag for content_type compendium', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/pnKnjIjas9bZgbB',
                 path: '/',
@@ -102,17 +216,19 @@ describe('Sciebo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 404);
+                assert.equal(res.statusCode, 400);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'Single directory found. Use the "path" parameter to point to the compendium directory.');
+                assert.propertyVal(JSON.parse(body), 'error', 'load from share failed: bagit not found but content type is compendium');
                 done();
             });
         }).timeout(10000);
+    });
 
-        it('public share with multiple directories / files: should throw an error (workspace not implemented) ', (done) => {
+    describe('load from public share with multiple directories', () => {
+        it('should throw an error for content_type "compendium"', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/tY6I8NrDxTeXG85',
-                path: '/',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/UkQtsyOfYLDQVr1',
+                path: '/testdir',
                 content_type: 'compendium',
             };
 
@@ -128,16 +244,44 @@ describe('Sciebo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 403);
+                assert.equal(res.statusCode, 400);
                 assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
+                assert.propertyVal(JSON.parse(body), 'error', 'load from share failed: bagit not found but content type is compendium');
                 done();
             });
         }).timeout(10000);
     });
 
-    describe('No new compendium with invalid requests', () => {
-        it('invalid share URL: should respond with an error 422', (done) => {
+    describe('load from public share with multiple zip files', () => {
+        it('should respond with an error', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/NSqqEdjVIjhPf0N',
+                path: '/',
+                content_type: 'compendium'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 400);
+                assert.isUndefined(JSON.parse(body).id, 'returned no id');
+                assert.include(JSON.parse(body).error, 'load from share failed');
+                done();
+            });
+        }).timeout(20000);
+    });
+
+    describe('invalid share URLs', () => {
+        it('should respond with an error 422', (done) => {
             let form = {
                 share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
                 path: '/',
@@ -162,8 +306,10 @@ describe('Sciebo loader', function () {
                 done();
             });
         }).timeout(10000);
+    });
 
-        it('invalid host (not a sciebo public share): should respond with an error 403', (done) => {
+    describe('invalid host (not a Sciebo public share)', () => {
+        it('should respond with an error 403', (done) => {
             let form = {
                 share_url: 'https://myowncloud.wxyz/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/',
@@ -188,8 +334,10 @@ describe('Sciebo loader', function () {
                 done();
             });
         }).timeout(10000);
+    });
 
-        it('invalid token: should respond with an error 404', (done) => {
+    describe('invalid token', () => {
+        it('should respond with an error 404', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
                 path: '/',
@@ -214,8 +362,10 @@ describe('Sciebo loader', function () {
                 done();
             });
         }).timeout(10000);
+    });
 
-        it('invalid webdav path: should respond with an error 404', (done) => {
+    describe('invalid WebDAV path', () => {
+        it('should respond with an error 404', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
@@ -240,8 +390,10 @@ describe('Sciebo loader', function () {
                 done();
             });
         }).timeout(10000);
+    });
 
-        it('insufficient user level: should respond with an error 401', (done) => {
+    describe('invalid user level', () => {
+        it('should respond with an error 401', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
                 path: '/ekjsle5',
@@ -266,6 +418,5 @@ describe('Sciebo loader', function () {
                 done();
             });
         }).timeout(10000);
-    });  
+    });
 });
-

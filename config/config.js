@@ -74,6 +74,7 @@ c.bagit.validation.failUpload = true;
 // metadata extraction and brokering options
 c.meta = {};
 c.meta.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+c.meta.versionFile = 'version';
 
 c.meta.extract = {};
 c.meta.extract.module = 'extract';

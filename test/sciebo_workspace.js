@@ -26,15 +26,12 @@ const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9y
 const requestLoadingTimeout = 20000;
 
 
-describe('Sciebo loader', function () {
-
-    var compendium_id = '';
-
-    describe('create new compendium based on public WebDAV', () => {
-        it('public share with bagit.txt: should respond with a compendium ID', (done) => {
+describe('Sciebo loader with workspaces', function () {
+    describe('create new compendium based on a workspace in a public WebDAV', () => {
+        it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/c7hsPIHGvgWnD6U',
-                content_type: 'compendium'
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/96XJFrmd3cSYGko',
+                content_type: 'workspace'
             };
 
             let j = request.jar();
@@ -52,16 +49,14 @@ describe('Sciebo loader', function () {
                 assert.equal(res.statusCode, 200);
                 assert.isObject(JSON.parse(body), 'returned JSON');
                 assert.isDefined(JSON.parse(body).id, 'returned id');
-                compendium_id = JSON.parse(body).id;
                 done();
             });
         }).timeout(20000);
 
-        it('public share with zip file: should respond with a compendium ID', (done) => {
+        it('should download the files in the workspace and list them via the API', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/9R3P3xDe9K4ClmG',
-                path: '/',
-                content_type: 'compendium'
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/96XJFrmd3cSYGko',
+                content_type: 'workspace'
             };
 
             let j = request.jar();
@@ -76,73 +71,87 @@ describe('Sciebo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                assert.isObject(JSON.parse(body), 'returned JSON');
-                assert.isDefined(JSON.parse(body).id, 'returned id');
-                compendium_id = JSON.parse(body).id;
-                done();
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/main.Rmd');
+                    assert.include(JSON.stringify(response), 'data/display.html');
+
+                    done();
+                });
             });
         }).timeout(20000);
-
-        it('public share with single directory: should throw an error and notify that the directory contains no files', (done) => {
-            let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/pnKnjIjas9bZgbB',
-                path: '/',
-                content_type: 'compendium',
-            };
-
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, global.test_host);
-
-            request({
-                uri: global.test_host + '/api/v1/compendium',
-                method: 'POST',
-                jar: j,
-                form: form,
-                timeout: requestLoadingTimeout
-            }, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 404);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'Single directory found. Use the "path" parameter to point to the compendium directory.');
-                done();
-            });
-        }).timeout(10000);
-
-        it('public share with multiple directories / files: should throw an error (workspace not implemented) ', (done) => {
-            let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/tY6I8NrDxTeXG85',
-                path: '/',
-                content_type: 'compendium',
-            };
-
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, global.test_host);
-
-            request({
-                uri: global.test_host + '/api/v1/compendium',
-                method: 'POST',
-                jar: j,
-                form: form,
-                timeout: requestLoadingTimeout
-            }, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 403);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'workspace creation not implemented');
-                done();
-            });
-        }).timeout(10000);
     });
 
-    describe('No new compendium with invalid requests', () => {
-        it('invalid share URL: should respond with an error 422', (done) => {
+    describe('create new compendium based on a workspace in a public WebDAV with workspace in a subdirectory', () => {
+        let compendium_id = null;
+
+        it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/VEX8Bd88hPAm7fa',
+                path: '/my-research',
+                content_type: 'workspace'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                compendium_id = JSON.parse(body).id;
+                done();
+            });
+        }).timeout(20000);
+
+        it('should have downloaded the files in the workspace and list them via the API', (done) => {
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                method: 'GET',
+                jar: j,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                let response = JSON.parse(body);
+
+                assert.include(JSON.stringify(response), 'data/main.Rmd');
+                assert.include(JSON.stringify(response), 'data/display.html');
+                assert.notInclude(JSON.stringify(response), 'shouldnotbethere');
+
+                done();
+            });
+        });
+    });
+
+    describe('create new compendium based on a workspace in a public WebDAV with a single zip file', () => {
+        it('should respond with a compendium ID', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/Pu58dfPYcIvM2GX',
                 path: '/',
-                content_type: 'compendium',
+                content_type: 'workspace'
             };
 
             let j = request.jar();
@@ -157,18 +166,17 @@ describe('Sciebo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 422);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
                 done();
             });
-        }).timeout(10000);
+        }).timeout(20000);
 
-        it('invalid host (not a sciebo public share): should respond with an error 403', (done) => {
+        it('should download the files in the workspace and list them via the API', (done) => {
             let form = {
-                share_url: 'https://myowncloud.wxyz/index.php/s/G8vxQ1h50V4HpuA',
-                path: '/',
-                content_type: 'compendium',
+                share_url: 'https://uni-muenster.sciebo.de/index.php/s/Pu58dfPYcIvM2GX',
+                content_type: 'workspace'
             };
 
             let j = request.jar();
@@ -183,90 +191,159 @@ describe('Sciebo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 403);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'host is not allowed');
-                done();
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/main.R');
+                    assert.include(JSON.stringify(response), 'data/display.png');
+
+                    done();
+                });
             });
-        }).timeout(10000);
-
-        it('invalid token: should respond with an error 404', (done) => {
-            let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
-                path: '/',
-                content_type: 'compendium',
-            };
-
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, global.test_host);
-
-            request({
-                uri: global.test_host + '/api/v1/compendium',
-                method: 'POST',
-                jar: j,
-                form: form,
-                timeout: requestLoadingTimeout
-            }, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 404);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
-                done();
-            });
-        }).timeout(10000);
-
-        it('invalid webdav path: should respond with an error 404', (done) => {
-            let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
-                path: '/ekjsle5',
-                content_type: 'compendium',
-            };
-
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie);
-            j.setCookie(ck, global.test_host);
-
-            request({
-                uri: global.test_host + '/api/v1/compendium',
-                method: 'POST',
-                jar: j,
-                form: form,
-                timeout: requestLoadingTimeout
-            }, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 404);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
-                done();
-            });
-        }).timeout(10000);
-
-        it('insufficient user level: should respond with an error 401', (done) => {
-            let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
-                path: '/ekjsle5',
-                content_type: 'compendium',
-            };
-
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie_plain);
-            j.setCookie(ck, global.test_host);
-
-            request({
-                uri: global.test_host + '/api/v1/compendium',
-                method: 'POST',
-                jar: j,
-                form: form,
-                timeout: requestLoadingTimeout
-            }, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 401);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.propertyVal(JSON.parse(body), 'error', 'user level does not allow compendium creation');
-                done();
-            });
-        }).timeout(10000);
-    });  
+        }).timeout(20000);
+    });
 });
 
+describe('Sciebo loader with invalid requests', () => {
+    it('should respond with an error 422 for an invalid share URL', (done) => {
+        let form = {
+            share_url: 'htts:/uni-muenster.sciebo.de/index.php/s/7EoWgjLSFV',
+            path: '/',
+            content_type: 'workspace',
+        };
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie);
+        j.setCookie(ck, global.test_host);
+
+        request({
+            uri: global.test_host + '/api/v1/compendium',
+            method: 'POST',
+            jar: j,
+            form: form,
+            timeout: requestLoadingTimeout
+        }, (err, res, body) => {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 422);
+            assert.isUndefined(JSON.parse(body).id, 'returned no id');
+            assert.propertyVal(JSON.parse(body), 'error', 'public share URL is invalid');
+            done();
+        });
+    }).timeout(10000);
+
+    it('invalid host (not a sciebo public share): should respond with an error 403', (done) => {
+        let form = {
+            share_url: 'https://myowncloud.wxyz/index.php/s/G8vxQ1h50V4HpuA',
+            path: '/',
+            content_type: 'workspace',
+        };
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie);
+        j.setCookie(ck, global.test_host);
+
+        request({
+            uri: global.test_host + '/api/v1/compendium',
+            method: 'POST',
+            jar: j,
+            form: form,
+            timeout: requestLoadingTimeout
+        }, (err, res, body) => {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 403);
+            assert.isUndefined(JSON.parse(body).id, 'returned no id');
+            assert.propertyVal(JSON.parse(body), 'error', 'host is not allowed');
+            done();
+        });
+    }).timeout(10000);
+
+    it('invalid token: should respond with an error 404', (done) => {
+        let form = {
+            share_url: 'https://uni-muenster.sciebo.de/index.php/s/89k3ljf93kjfa',
+            path: '/',
+            content_type: 'workspace',
+        };
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie);
+        j.setCookie(ck, global.test_host);
+
+        request({
+            uri: global.test_host + '/api/v1/compendium',
+            method: 'POST',
+            jar: j,
+            form: form,
+            timeout: requestLoadingTimeout
+        }, (err, res, body) => {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 404);
+            assert.isUndefined(JSON.parse(body).id, 'returned no id');
+            assert.propertyVal(JSON.parse(body), 'error', 'could not read webdav contents');
+            done();
+        });
+    }).timeout(10000);
+
+    it('insufficient user level: should respond with an error 401', (done) => {
+        let form = {
+            share_url: 'https://uni-muenster.sciebo.de/index.php/s/G8vxQ1h50V4HpuA',
+            path: '/ekjsle5',
+            content_type: 'workspace',
+        };
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie_plain);
+        j.setCookie(ck, global.test_host);
+
+        request({
+            uri: global.test_host + '/api/v1/compendium',
+            method: 'POST',
+            jar: j,
+            form: form,
+            timeout: requestLoadingTimeout
+        }, (err, res, body) => {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 401);
+            assert.isUndefined(JSON.parse(body).id, 'returned no id');
+            assert.propertyVal(JSON.parse(body), 'error', 'user level does not allow compendium creation');
+            done();
+        });
+    }).timeout(10000);
+});
+
+describe('Sciebo loader with empty workspace', function () {
+    it('should respond with an error 404 and valid JSON with error message', (done) => {
+        let form = {
+            share_url: 'https://uni-muenster.sciebo.de/index.php/s/KScGmzyCIMJkFa9',
+            path: '/',
+            content_type: 'workspace',
+        };
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie);
+        j.setCookie(ck, global.test_host);
+
+        request({
+            uri: global.test_host + '/api/v1/compendium',
+            method: 'POST',
+            jar: j,
+            form: form,
+            timeout: requestLoadingTimeout
+        }, (err, res, body) => {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 400);
+            assert.isUndefined(JSON.parse(body).id, 'returned no id');
+            assert.propertyVal(JSON.parse(body), 'error', 'public share is empty');
+            done();
+        });
+    }).timeout(10000);
+
+});
