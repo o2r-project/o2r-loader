@@ -39,10 +39,11 @@ install:
   - npm install
 before_script:
   - docker run --name mongodb -d -p 27017:27017 mongo:3.4
-  - docker run --name testmuncher -d -p 8088:8088 --link mongodb:mongodb -v $HOME:/tmp/o2r -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* o2rproject/o2r-muncher:latest
+  - docker run --name testmuncher -d -p 8080:8080 --link mongodb:mongodb -v $HOME:/tmp/o2r -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* o2rproject/o2r-muncher:latest
   - sleep 10
 script:
   - DEBUG=loader,loader:* LOADER_BASEPATH=$HOME/ npm start &
+  #- DEBUG=* npm test
   - DEBUG=* npm test
 after_failure:
   - sleep 5
