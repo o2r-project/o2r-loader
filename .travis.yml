@@ -5,9 +5,6 @@ node_js:
   - "8"
 services:
   - docker
-cache:
-  directories:
-    - "node_modules"
 addons:
   apt:
     packages:
@@ -35,6 +32,9 @@ before_install:
   - export LOADER_META_TOOL_EXE="python3 $HOME/meta/o2rmeta.py"
   - export LOADER_META_EXTRACT_MAPPINGS_DIR="$HOME/meta/broker/mappings"
   - cd $TRAVIS_BUILD_DIR
+  # https://github.com/npm/npm/issues/17858
+  - rm package-lock.json
+  - npm i -g npm@5.4.2
 install:
   - npm install
 before_script:
