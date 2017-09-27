@@ -30,9 +30,9 @@ c.api_version = 1;
 c.net.port = env.LOADER_PORT || 8088;
 c.mongo.location = env.LOADER_MONGODB || 'mongodb://localhost/';
 c.mongo.database = env.LOADER_MONGODB_DATABASE || 'muncher';
-c.mongo.inital_connection_attempts = 30;
-c.mongo.inital_connection_max_delay = 5000;
-c.mongo.inital_connection_initial_delay = 1000;
+c.mongo.initial_connection_attempts = 30;
+c.mongo.initial_connection_max_delay = 5000;
+c.mongo.initial_connection_initial_delay = 1000;
 
 // fix mongo location if trailing slash was omitted
 if (c.mongo.location[c.mongo.location.length-1] !== '/') {
@@ -99,12 +99,12 @@ c.meta.broker.mappings = {
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
 
-c.encoding.supportedEncodings = ['ISO-8859-1' ,'UTF-8','UTF-16BE','UTF-16LE','UTF-32BE','UTF-32LE', 'windows-1252'];
+c.encoding.supportedEncodings = ['ISO-8859-1', 'ISO-8859-2', 'UTF-8', 'UTF-16BE', 'UTF-16LE', 'UTF-32BE', 'UTF-32LE', 'windows-1252'];
 c.encoding.textFileRegex = '\.(txt|rmd|r|tex|json|yml|yaml)$';
 c.encoding.confidenceThreshold = 60;
 
 c.webdav.allowedHosts = ['sciebo'];
-c.webdav.urlString = 'public.php/webdav'; //end of webdav pubilc webdav url
+c.webdav.urlString = 'public.php/webdav'; //end of webdav public webdav url
 //c.webdav.urlString = 'nextcloud/public.php/dav'; //nextcloud public webdav url
 
 // Zenodo configuration
