@@ -24,37 +24,35 @@ const config = require('../config/config');
 require("./setup")
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
+const requestLoadingTimeout = 5000;
 
 
 describe('Metadata brokering during upload of ERC ', function () {
     describe('POST /api/v1/compendium response with ERC containing metadata', () => {
-        let compendium_id = '';
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie_o2r);
+        j.setCookie(ck, global.test_host);
+        let get = {
+            method: 'GET',
+            jar: j,
+            uri: null
+        };
+
         before(function (done) {
             let req = createCompendiumPostRequest('./test/erc/with_metadata', cookie_o2r);
-            this.timeout(10000);
+            this.timeout(20000);
+            req.timeout = 20000;
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
-                compendium_id = JSON.parse(body).id;
+                let compendium_id = JSON.parse(body).id;
+                get.uri = global.test_host_read + '/api/v1/compendium/' + compendium_id;
                 done();
             });
         });
 
-        it('should contain brokered metadata to o2r', (done) => {
-            request(global.test_host_read + '/api/v1/compendium/' + compendium_id, (err, res, body) => {
-                assert.ifError(err);
-                let response = JSON.parse(body);
-                assert.property(response, 'metadata');
-                assert.property(response.metadata, 'o2r');
-                assert.property(response.metadata.o2r, 'ercIdentifier');
-                assert.property(response.metadata.o2r, 'paperSource');
-                assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
-                done();
-            });
-        });
-
-        it('should contain brokered metadata to zenodo in correct structure', (done) => {
-            request(global.test_host_read + '/api/v1/compendium/' + compendium_id, (err, res, body) => {
+        it('should contain brokered metadata to Zenodo in correct structure', (done) => {
+            request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
                 assert.property(response, 'metadata');
@@ -63,18 +61,20 @@ describe('Metadata brokering during upload of ERC ', function () {
                 assert.property(response.metadata.zenodo.metadata, 'upload_type');
                 assert.property(response.metadata.zenodo.metadata, 'title');
                 assert.property(response.metadata.zenodo.metadata, 'description');
+                assert.property(response.metadata.zenodo.metadata, 'access_right');
+                assert.property(response.metadata.zenodo.metadata, 'license');
                 done();
             });
-        });
+        }).timeout(requestLoadingTimeout);
 
-        it('should contain brokered metadata to zenodo with correct values', (done) => {
-            request(global.test_host_read + '/api/v1/compendium/' + compendium_id, (err, res, body) => {
+        it('should contain brokered metadata to Zenodo with correct values', (done) => {
+            request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
                 assert.propertyVal(response.metadata.zenodo.metadata, 'upload_type', 'publication');
                 assert.propertyVal(response.metadata.zenodo.metadata, 'title', 'This is the title: it contains a colon');
                 done();
             });
-        });
+        }).timeout(requestLoadingTimeout);
     });
 });

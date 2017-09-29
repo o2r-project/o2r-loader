@@ -31,9 +31,9 @@ exports.create = (req, res) => {
   req.params = {};
 
   // validate content_type
-  if (req.body.content_type !== 'compendium_v1') {
-    res.status(500).send('Provided content_type not yet implemented, only "compendium_v1" is supported.');
-    debug('Provided content_type "%s" not implemented', req.body.content_type);
+  if (!config.compendium.supportedContentTypes.includes(req.body.content_type)) {
+    res.status(400).send('Provided content_type not implemented, only ' + JSON.stringify(config.compendium.supportedContentTypes) + ' supported.');
+    debug('content_type "%s" not supported', req.body.content_type);
     return;
   }
 
@@ -127,7 +127,7 @@ function prepareScieboLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadOwncloud((data, err) => {
     if (err) {
-      debug('Error during public share load: %s', err.message);
+      debug('Error during public share load from owncloud: %s', JSON.stringify(err));
     } else {
       debug('New compendium successfully loaded: %s', JSON.stringify(data));
 
@@ -164,7 +164,7 @@ function prepareZenodoLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadZenodo((data, err) => {
     if (err) {
-      debug('Error during public share load: %s', err.message);
+      debug('Error during public share load from Zenodo: %s', JSON.stringify(err));
     } else {
       debug('New compendium successfully loaded: %s', JSON.stringify(data));
 

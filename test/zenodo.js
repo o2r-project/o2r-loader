@@ -33,7 +33,7 @@ describe('Zenodo loader', function () {
         it('zenodo record: should respond with a compendium ID', (done) => {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/69114',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -60,7 +60,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/69114',
                 filename: 'metatainer.zip',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -86,7 +86,7 @@ describe('Zenodo loader', function () {
         it('zenodo record, "doi" parameter: should respond with a compendium ID', (done) => {
             let form = {
                 doi: '10.5072/zenodo.69114', // intenally taken apart and using sandbox
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -113,7 +113,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'http://doi.org/10.5072/zenodo.69114', // page not found, internally using only id in sandbox.zenodo.org
                 filename: 'metatainer.zip',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -139,7 +139,7 @@ describe('Zenodo loader', function () {
         it('zenodo record, "zenodo_record_id" parameter: should respond with a compendium ID', (done) => {
             let form = {
                 zenodo_record_id: '69114',
-                content_type: 'compendium_v1'
+                content_type: 'compendium'
             };
 
             let j = request.jar();
@@ -168,7 +168,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'htts?///sandbox.zenodo.org/record/69114',
                 filename: 'metatainer.zip',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -194,7 +194,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'https://sandbox.ODONEZ.org/record/69114',
                 filename: 'metatainer.zip',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -219,7 +219,7 @@ describe('Zenodo loader', function () {
         it('invalid DOI: should respond with an error 422', (done) => {
             let form = {
                 doi: 'invalid.doi/09983123',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -244,7 +244,7 @@ describe('Zenodo loader', function () {
         it('invalid zenodo_record_id (not a zenodo record): should respond with an error 422', (done) => {
             let form = {
                 zenodo_record_id: 'eigthhundredseventytwo',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -269,7 +269,7 @@ describe('Zenodo loader', function () {
         it('invalid zenodoID in share_url: should respond with an error 422', (done) => {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/asdfasdf',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -295,7 +295,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/69114',
                 filename: 'not_existing_file.xyz',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();
@@ -319,7 +319,7 @@ describe('Zenodo loader', function () {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/69114',
                 filename: 'not_existing_file.xyz',
-                content_type: 'compendium_v1',
+                content_type: 'compendium',
             };
 
             let j = request.jar();

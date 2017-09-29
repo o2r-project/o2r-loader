@@ -29,56 +29,77 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 
 describe('Direct upload of ERC', function () {
     describe('POST /api/v1/compendium response with executable ERC', () => {
-        before(function (done) {
+        it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
-            this.timeout(10000);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
+                assert.equal(res.statusCode, 200);
                 done();
             });
-        });
+        }).timeout(requestLoadingTimeout);
 
-        it('should respond with HTTP 200 OK', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+        it('should respond with HTTP 200 OK when using upload type "compendium" explicitly', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r, 'compendium');
 
-                request(req, (err, res, body) => {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 200);
-                    done();
-                });
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                done();
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
 
         it('should respond with valid JSON', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-                request(req, (err, res, body) => {
-                    assert.ifError(err);
-                    assert.isObject(JSON.parse(body), 'returned JSON');
-                    done();
-                });
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                done();
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
 
         it('should give a response including the id field', (done) => {
-            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
-                let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-                request(req, (err, res, body) => {
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                assert.property(JSON.parse(body), 'id');
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+
+        it('should contain brokered metadata for o2r metadata section (if asking as the uploading user)', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+
+                let j = request.jar();
+                let ck = request.cookie('connect.sid=' + cookie_o2r);
+                j.setCookie(ck, global.test_host);
+                let get = {
+                    method: 'GET',
+                    jar: j,
+                    uri: global.test_host_read + '/api/v1/compendium/' + JSON.parse(body).id
+                };
+
+                request(get, (err, res, body) => {
                     assert.ifError(err);
-                    assert.isDefined(JSON.parse(body).id, 'returned id');
-                    assert.property(JSON.parse(body), 'id');
+                    let response = JSON.parse(body);
+                    assert.property(response, 'metadata');
+                    assert.property(response.metadata, 'o2r');
+                    assert.property(response.metadata.o2r, 'ercIdentifier');
+                    //assert.propertyVal(response.metadata.o2r, 'ercIdentifier', 'KIbebWnPlx');
+                    //assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
                     done();
                 });
             });
-        }).timeout(10000);
+        }).timeout(requestLoadingTimeout);
     });
 
-    // bag is not validated on upload by default anymore
-    describe.skip('POST /api/v1/compendium with invalid bag', () => {
+    describe('POST /api/v1/compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
@@ -103,7 +124,7 @@ describe('Direct upload of ERC', function () {
 
     describe.skip('POST /api/v1/compendium with virus', () => {
         it('upload compendium should fail and return an error message about infected files', (done) => {
-            let req = createCompendiumPostRequest('./test/bagtainers/virustainer', cookie);
+            let req = createCompendiumPostRequest('./test/erc/virustainer', cookie);
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 422);

@@ -20,6 +20,8 @@ config.version = require('./package.json').version;
 const debug = require('debug')('loader');
 const mongoose = require('mongoose');
 const backoff = require('backoff');
+const exec = require('child_process').exec;
+const fs = require('fs');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
@@ -30,10 +32,14 @@ fse.mkdirsSync(config.fs.compendium);
 // use ES6 promises for mongoose
 mongoose.Promise = global.Promise;
 const dbURI = config.mongo.location + config.mongo.database;
-mongoose.connect(dbURI, {
+var dbOptions = {
+  autoReconnect: true,
+  reconnectTries: Number.MAX_VALUE,
+  keepAlive: 30000,
+  socketTimeoutMS: 30000,
   useMongoClient: true,
-  promiseLibrary: global.Promise // use ES6 promises for underlying MongoDB DRIVE
-});
+  promiseLibrary: mongoose.Promise
+};
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);
 });
@@ -156,6 +162,9 @@ function initApp(callback) {
       res.send(response);
     });
 
+    /*
+     * Slack configuration
+     */
     if (config.slack.enable) {
       slackbot.start((err) => {
         debug('Error starting slackbot (disabling it now): %s', err);
@@ -165,6 +174,31 @@ function initApp(callback) {
       });
     }
 
+    /*
+     * Python version and meta tools version
+     */
+    let pythonVersionCmd = 'echo ';
+    if (config.meta.cliPath.toLowerCase().startsWith('python')) {
+      pythonVersionCmd = pythonVersionCmd.concat('$(', config.meta.cliPath.split(" ")[0], ' --version)');
+    } else {
+      pythonVersionCmd = pythonVersionCmd.concat('$(python --version)')
+    }
+    exec(pythonVersionCmd, (error, stdout, stderr) => {
+      if (error) {
+        debug('Error detecting python version: %s', error);
+      } else {
+        let version = stdout.concat(stderr);
+        debug('Using "%s" for meta tools at "%s"', version.trim(), config.meta.cliPath);
+      }
+    });
+    let versionFile = config.meta.broker.mappings.dir.split('broker/')[0].concat(config.meta.versionFile);
+    fs.readFile(versionFile, 'utf8', function (err, data) {
+      debug('meta tools version: %s', data.trim());
+    })
+
+    /*
+     * final startup message
+     */
     const server = app.listen(config.net.port, () => {
       debug('loader %s with API version %s waiting for requests on port %s',
         config.version,
@@ -182,20 +216,17 @@ function initApp(callback) {
 
 var dbBackoff = backoff.fibonacci({
   randomisationFactor: 0,
-  initialDelay: config.mongo.inital_connection_initial_delay,
-  maxDelay: config.mongo.inital_connection_max_delay
+  initialDelay: config.mongo.initial_connection_initial_delay,
+  maxDelay: config.mongo.initial_connection_max_delay
 });
 
-dbBackoff.failAfter(config.mongo.inital_connection_attempts);
+dbBackoff.failAfter(config.mongo.initial_connection_attempts);
 dbBackoff.on('backoff', function (number, delay) {
   debug('Trying to connect to MongoDB (#%s) in %sms', number, delay);
 });
 dbBackoff.on('ready', function (number, delay) {
   debug('Connect to MongoDB (#%s)', number, delay);
-  mongoose.connect(dbURI, {
-    useMongoClient: true,
-    promiseLibrary: global.Promise
-  }, (err) => {
+  mongoose.connect(dbURI, dbOptions, (err) => {
     if (err) {
       debug('Error during connect: %s', err);
       mongoose.disconnect(() => {
@@ -213,7 +244,6 @@ dbBackoff.on('ready', function (number, delay) {
           });
           dbBackoff.backoff();
         }
-        debug('Started application.');
       });
     }
   });

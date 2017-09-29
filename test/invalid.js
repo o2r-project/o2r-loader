@@ -31,7 +31,7 @@ describe('Direct upload of invalid files', function () {
     describe('POST /api/v1/compendium invalid.zip (not a zip file)', () => {
         it('should respond with HTTP 500 error', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/invalid.zip'),
                     options: {
@@ -61,7 +61,7 @@ describe('Direct upload of invalid files', function () {
 
         it('should provide a useful error message', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/invalid.zip'),
                     options: {
@@ -90,7 +90,7 @@ describe('Direct upload of invalid files', function () {
 
         it('should NOT respond with internal configuration of the server', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/invalid.zip'),
                     options: {
@@ -119,7 +119,7 @@ describe('Direct upload of invalid files', function () {
     describe('POST /api/v1/compendium empty.zip (empty zip file)', () => {
         it('should respond with ERROR 500 and valid JSON document', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/empty.zip'),
                     options: {
@@ -147,7 +147,7 @@ describe('Direct upload of invalid files', function () {
 
         it('should respond provide a helpful error message', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/empty.zip'),
                     options: {
@@ -174,7 +174,7 @@ describe('Direct upload of invalid files', function () {
 
         it('should NOT respond with internal configuration of the server', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/empty.zip'),
                     options: {
@@ -203,7 +203,7 @@ describe('Direct upload of invalid files', function () {
     describe('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
         it('should respond with HTTP 422 error', (done) => {
             let formData = {
-                'content_type': 'compendium_v1',
+                'content_type': 'compendium',
                 'compendium': {
                     value: fs.createReadStream('./test/erc/unsupported_encoding.zip'),
                     options: {
@@ -232,6 +232,6 @@ describe('Direct upload of invalid files', function () {
                 assert.include(JSON.parse(body).error.files[0].encoding, 'Shift_JIS');
                 done();
             });
-        });
+        }).timeout(requestLoadingTimeout);
     });
 });
