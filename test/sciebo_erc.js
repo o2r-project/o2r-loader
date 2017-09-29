@@ -94,7 +94,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        });
+        }).timeout(20000);;
     });
 
     describe('create new compendium based on public WebDAV share with one zip file', () => {
@@ -162,7 +162,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        });
+        }).timeout(20000);;
     });
 
     // not implemented yet, must be able to load specific file
