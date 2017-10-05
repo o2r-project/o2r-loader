@@ -99,8 +99,10 @@ c.meta.broker.mappings = {
   dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
 };
 
+// Encoding check settings
+// A list of analyzed files can be found here: https://github.com/o2r-project/o2r-meta#supported-files-and-formats-for-the-metadata-extraction-process
 c.encoding.supportedEncodings = ['ISO-8859-1', 'ISO-8859-2', 'UTF-8', 'UTF-16BE', 'UTF-16LE', 'UTF-32BE', 'UTF-32LE', 'windows-1252'];
-c.encoding.textFileRegex = '\.(txt|rmd|r|tex|json|yml|yaml)$';
+c.encoding.textFileRegex = '\.(txt|rmd|r|json|yml|yaml)$';
 c.encoding.confidenceThreshold = 60;
 
 c.webdav.allowedHosts = ['sciebo'];
