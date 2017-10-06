@@ -1,6 +1,6 @@
 {
   "name": "o2r-loader",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Node.js implementation for loading compendia and workspaces from external repositories for the [o2r web api](http://o2r.info/o2r-web-api).",
   "main": "index.js",
   "scripts": {
