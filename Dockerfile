@@ -34,6 +34,9 @@ RUN apk add --no-cache \
     make \
     unzip \
     dumb-init \
+    # needed for loading
+    wget \
+    openssl \
   && pip3 install bagit
 
 # o2r-meta
