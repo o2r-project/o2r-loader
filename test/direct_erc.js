@@ -70,6 +70,33 @@ describe('Direct upload of ERC', function () {
             });
         }).timeout(requestLoadingTimeout);
 
+        it('should contain the correct values for properties compendium and bag', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+
+                let j = request.jar();
+                let ck = request.cookie('connect.sid=' + cookie_o2r);
+                j.setCookie(ck, global.test_host);
+                let get = {
+                    method: 'GET',
+                    jar: j,
+                    uri: global.test_host_read + '/api/v1/compendium/' + JSON.parse(body).id
+                };
+
+                request(get, (err, res, body) => {
+                    assert.ifError(err);
+                    let response = JSON.parse(body);
+                    assert.property(response, 'bag');
+                    assert.propertyVal(response, 'bag', true);
+                    assert.property(response, 'compendium');
+                    assert.propertyVal(response, 'compendium', true);
+                    done();
+                });
+            });
+        }).timeout(requestLoadingTimeout);
+
         it('should contain brokered metadata for o2r metadata section (if asking as the uploading user)', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 

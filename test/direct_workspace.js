@@ -81,7 +81,6 @@ describe('Direct upload of minimal workspace (script) without basedir', function
     });
 });
 
-
 describe('Direct upload of minimal workspace (script) _with_ basedir', function () {
     describe('POST /api/v1/compendium to create a new compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
@@ -111,7 +110,7 @@ describe('Direct upload of minimal workspace (script) _with_ basedir', function 
             });
         }).timeout(requestLoadingTimeout);
 
-        it('should not contain the stripped dir in the files metadata but still have subdir', (done) => {
+        it('should contain the correct values for properties compendium and bag', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-script-basedir', cookie_o2r, 'workspace');
                 this.timeout(requestLoadingTimeout);
@@ -132,8 +131,60 @@ describe('Direct upload of minimal workspace (script) _with_ basedir', function 
 
                     request(get, (err, res, body) => {
                         assert.ifError(err);
-                        assert.notInclude(body, 'shouldberemoved');
-                        assert.include(JSON.stringify(body), 'data/datadirshouldstillbethere/text.csv');
+                        let response = JSON.parse(body);
+                        assert.property(response, 'bag');
+                        assert.propertyVal(response, 'bag', false);
+                        assert.property(response, 'compendium');
+                        assert.propertyVal(response, 'compendium', false);
+                        done();
+                    });
+                });
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+});
+
+describe('Direct upload of minimal workspace (script) as bag', function () {
+    describe('POST /api/v1/compendium to create a new compendium', () => {
+        it('should respond with HTTP 200 OK and valid JSON', (done) => {
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script-bag', cookie_o2r, 'workspace');
+
+                request(req, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    assert.isObject(JSON.parse(body), 'returned JSON');
+                    done();
+                });
+            });
+        }).timeout(requestLoadingTimeout);
+
+        it('should contain the correct values for properties compendium and bag', (done) => {
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                let req = createCompendiumPostRequest('./test/workspace/minimal-script-bag', cookie_o2r, 'workspace');
+                this.timeout(requestLoadingTimeout);
+
+                request(req, (err, res, body) => {
+                    assert.ifError(err);
+                    let compendium_id = JSON.parse(body).id;
+
+                    let j = request.jar();
+                    let ck = request.cookie('connect.sid=' + cookie_o2r);
+                    j.setCookie(ck, global.test_host);
+                    let get = {
+                        uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                        method: 'GET',
+                        jar: j,
+                        timeout: requestLoadingTimeout
+                    };
+
+                    request(get, (err, res, body) => {
+                        assert.ifError(err);
+                        let response = JSON.parse(body);
+                        assert.property(response, 'bag');
+                        assert.propertyVal(response, 'bag', true);
+                        assert.property(response, 'compendium');
+                        assert.propertyVal(response, 'compendium', false);
                         done();
                     });
                 });
