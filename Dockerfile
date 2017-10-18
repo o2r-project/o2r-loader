@@ -12,13 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM node:8-alpine
-
-# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
-RUN echo \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
+FROM alpine:3.6
 
 # Python, based on frolvlad/alpine-python3
 RUN apk add --no-cache \
@@ -29,16 +23,20 @@ RUN apk add --no-cache \
   && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
   && rm -r /root/.cache
 
+# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
+
 RUN apk add --no-cache \
     git \
     make \
-    wget \
     unzip \
-    openssl \
+    nodejs \
+    icu-dev \
     dumb-init \
-    ca-certificates \
-  && pip3 install bagit \
-  && git clone --depth 1 -b master https://github.com/o2r-project/o2r-loader /loader
+    nodejs-npm \
+  && pip3 install bagit
 
 # o2r-meta
 RUN apk add --no-cache \
@@ -59,14 +57,18 @@ RUN echo $(git rev-parse --short HEAD) >> version
 
 # Install app
 WORKDIR /loader
+COPY config config
+COPY controllers controllers
+COPY lib lib
+COPY index.js index.js
+COPY package.json package.json
+
 RUN npm install --production
 
 # Clean up
 RUN apk del \
     git \
-    wget \
     make \
-    ca-certificates \
   && rm -rf /var/cache
 
 # Metadata params provided with docker build command
@@ -80,7 +82,7 @@ ARG META_VERSION
 LABEL org.label-schema.vendor="o2r project" \
       org.label-schema.url="http://o2r.info" \
       org.label-schema.name="o2r loader" \
-      org.label-schema.description="ERC loading" \    
+      org.label-schema.description="compendium and workspace loading from uploaded files and cloud resources" \    
       org.label-schema.version=$VERSION \
       org.label-schema.vcs-url=$VCS_URL \
       org.label-schema.vcs-ref=$VCS_REF \
