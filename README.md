@@ -108,6 +108,14 @@ For this, the loader has to run locally or as part of a docker-compose configura
 
 The file `Dockerfile` describes the Docker image published at [Docker Hub](https://hub.docker.com/r/o2rproject/o2r-loader/).
 
+```bash
+docker build --tag loader .
+
+docker run --name mongodb -d -p 27017:27017 mongo:3.4
+
+docker run --name testloader -it -p 8088:8088 --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
+```
+
 ## License
 
 o2r-loader is licensed under Apache License, Version 2.0, see file LICENSE.
