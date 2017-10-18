@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM alpine:3.6
+FROM node:8-alpine
+# FROM alpine:3.6 does not work because of https://github.com/sonicdoe/detect-character-encoding/issues/8
 
 # Python, based on frolvlad/alpine-python3
 RUN apk add --no-cache \
@@ -32,10 +33,7 @@ RUN apk add --no-cache \
     git \
     make \
     unzip \
-    nodejs \
-    icu-dev \
     dumb-init \
-    nodejs-npm \
   && pip3 install bagit
 
 # o2r-meta
