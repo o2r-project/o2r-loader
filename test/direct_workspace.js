@@ -248,7 +248,7 @@ describe('Direct upload of minimal workspace (rmd)', function () {
                 assert.propertyVal(response.metadata.o2r, 'description', 'Capacity of container ships in seaborne trade of the world container ship fleet.\n');
                 assert.equal(response.metadata.o2r.author.length, 1);
                 assert.propertyVal(response.metadata.o2r.author[0], 'affiliation', 'o2r team');
-                assert.propertyVal(response.metadata.o2r, 'paperSource', 'main.Rmd'); // if this breaks, the skipped test below can be updated
+                assert.propertyVal(response.metadata.o2r, 'mainfile', 'main.Rmd'); // if this breaks, the skipped test below can be updated
 
                 done();
             });
