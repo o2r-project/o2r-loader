@@ -254,7 +254,7 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             });
         });
 
-        it.skip('should have detected the correct main and display file', (done) => {
+        it('should have detected the correct main and display file', (done) => {
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie_o2r);
             j.setCookie(ck, global.test_host);
@@ -342,4 +342,56 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             });
         }).timeout(requestLoadingTimeout);
     });
+});
+
+describe('Direct upload of minimal workspace (rmd) with data file', function () {
+    describe('POST /api/v1/compendium processing result', () => {
+        let compendium_id = '';
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie_o2r);
+        j.setCookie(ck, global.test_host);
+        let get = {
+            method: 'GET',
+            jar: j,
+            timeout: 10000
+        };
+
+        before(function (done) {
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                this.timeout(requestLoadingTimeout);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-rmd-data', cookie_o2r, 'workspace');
+
+                request(req, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+                    compendium_id = response.id;
+                    get.uri = global.test_host_read + '/api/v1/compendium/' + compendium_id;
+                    done();
+                });
+            });
+        });
+
+        it('should list the data file along with three other files/directories', (done) => {
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie_o2r);
+            j.setCookie(ck, global.test_host);
+            let get = {
+                uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                method: 'GET',
+                jar: j,
+                timeout: 10000
+            };
+
+            request(get, (err, res, body) => {
+                assert.ifError(err);
+                let response = JSON.parse(body);
+                assert.lengthOf(response.files.children, 4); // .erc, data.csv, display.html, main.Rmd
+                assert.include(JSON.stringify(response.files.children), compendium_id + '/data/data.csv');
+                done();
+            });
+        });
+    });
+
 });
