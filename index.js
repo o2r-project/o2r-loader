@@ -22,6 +22,7 @@ const mongoose = require('mongoose');
 const backoff = require('backoff');
 const exec = require('child_process').exec;
 const fs = require('fs');
+const colors = require('colors');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
@@ -175,31 +176,51 @@ function initApp(callback) {
     }
 
     /*
-     * Python version and meta tools version
+     * Check Docker access and meta image
      */
-    let pythonVersionCmd = 'echo ';
-    if (config.meta.cliPath.toLowerCase().startsWith('python')) {
-      pythonVersionCmd = pythonVersionCmd.concat('$(', config.meta.cliPath.split(" ")[0], ' --version)');
-    } else {
-      pythonVersionCmd = pythonVersionCmd.concat('$(python --version)')
-    }
+    Docker = require('dockerode');
+    docker = new Docker();
+    docker.ping((err, data) => {
+      if (err) {
+        debug('Error pinging Docker: %s'.yellow, err);
+        throw err;
+      } else {
+        debug('Docker available? %s', data);
+        debug('meta tools version: %s', config.meta.toolContainer);
+
+        docker.pull(config.meta.toolContainer, function (err, stream) {
+          if(err) {
+            debug('error pulling meta image: %s', err);
+          } else {
+            function onFinished(err, output) {
+              if(err) {
+                debug('error pulling meta image: %s', JSON.stringify(err));
+              } else {
+                debug('pulled meta tools image: %s', JSON.stringify(output));
+              }
+              delete docker;
+              delete Docker;
+            }
+
+            docker.modem.followProgress(stream, onFinished);  
+          }
+        });
+      }
+    });
+
+    /*
+     * Python version, used for bagit
+     */
+    let pythonVersionCmd = 'echo $(python --version)';
     exec(pythonVersionCmd, (error, stdout, stderr) => {
       if (error) {
         debug('Error detecting python version: %s', error);
       } else {
         let version = stdout.concat(stderr);
-        debug('Using "%s" for meta tools at "%s"', version.trim(), config.meta.cliPath);
+        debug('Using "%s" for bagit.py', version.trim());
       }
     });
-    let versionFile = config.meta.broker.mappings.dir.split('broker/')[0].concat(config.meta.versionFile);
-    fs.readFile(versionFile, 'utf8', function (err, data) {
-      if (err) {
-        debug('could not read meta tools version: %s', err);
-      } else {
-        debug('meta tools version: %s', data.trim());
-      }
-    });
-
+  
     /*
      * final startup message
      */

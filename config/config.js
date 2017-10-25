@@ -71,9 +71,9 @@ c.bagit.validation = {};
 c.bagit.validation.fast = false;
 c.bagit.validation.failUpload = true;
 
-// metadata extraction and brokering options
+// metadata extraction options
 c.meta = {};
-c.meta.cliPath = env.LOADER_META_TOOL_EXE || 'python3 ../o2r-meta/o2rmeta.py';
+c.meta.toolContainer = env.LOADER_META_TOOL_CONTAINER || 'o2rproject/o2r-meta:latest';
 c.meta.versionFile = 'version';
 
 c.meta.extract = {};
@@ -81,23 +81,8 @@ c.meta.extract.module = 'extract';
 c.meta.extract.outputDir = '.erc';
 c.meta.extract.targetElement = 'o2r';
 c.meta.extract.bestCandidateFile = 'metadata_raw.json';
-c.meta.extract.failOnNoMetadata = false;
+c.meta.extract.failOnNoMetadata = true;
 c.meta.extract.stayOffline = true;
-
-c.meta.broker = {};
-c.meta.broker.enable = true;
-c.meta.broker.module = 'broker';
-c.meta.broker.mappings = {
-  zenodo: {
-    targetElement: 'zenodo.metadata',
-    file: 'zenodo-map.json'
-  },
-  o2r: {
-    targetElement: 'o2r',
-    file: 'o2r-map.json'
-  },
-  dir: env.LOADER_META_EXTRACT_MAPPINGS_DIR || '../o2r-meta/broker/mappings'
-};
 
 // Encoding check settings
 // A list of analyzed files can be found here: https://github.com/o2r-project/o2r-meta#supported-files-and-formats-for-the-metadata-extraction-process
