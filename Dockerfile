@@ -17,11 +17,12 @@ FROM node:8-alpine
 
 # Python, based on frolvlad/alpine-python3
 RUN apk add --no-cache \
-  python3 \
-  && python3 -m ensurepip \
+  python2 \
+  && python2 -m ensurepip \
   && rm -r /usr/lib/python*/ensurepip \
-  && pip3 install --upgrade pip setuptools \
-  && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
+  && pip install --upgrade pip setuptools \
+  && if [ ! -e /usr/bin/pip ]; then ln -s pip /usr/bin/pip ; fi \
+  && if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python2 /usr/bin/python; fi \
   && rm -r /root/.cache
 
 # Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
@@ -30,54 +31,36 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/reposito
   && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 
 RUN apk add --no-cache \
-    git \
-    make \
     unzip \
     dumb-init \
     # needed for loading
     wget \
     openssl \
-  && pip3 install bagit
-
-# o2r-meta
-RUN apk add --no-cache \
-    gcc \
+    # needed for npm install gyp
+    make \
     g++ \
-    python3-dev \
-    libxml2-dev \
-    libxslt-dev \
-    gdal \
-    gdal-dev \
-    py-gdal \
-  && git clone --depth 1 -b master https://github.com/o2r-project/o2r-meta.git /meta
-WORKDIR /meta
-RUN pip3 install -r requirements.txt
-ENV LOADER_META_TOOL_EXE="python3 /meta/o2rmeta.py"
-ENV LOADER_META_EXTRACT_MAPPINGS_DIR="/meta/broker/mappings"
-RUN echo $(git rev-parse --short HEAD) >> version
+  && pip install bagit
 
 # Install app
 WORKDIR /loader
+COPY package.json package.json
+RUN npm install --production
+
+RUN apk del \
+  make \
+  g++ \
+  && rm -rf /var/cache
+
 COPY config config
 COPY controllers controllers
 COPY lib lib
 COPY index.js index.js
-COPY package.json package.json
-
-RUN npm install --production
-
-# Clean up
-RUN apk del \
-    git \
-    make \
-  && rm -rf /var/cache
 
 # Metadata params provided with docker build command
 ARG VERSION=dev
 ARG VCS_URL
 ARG VCS_REF
 ARG BUILD_DATE
-ARG META_VERSION
 
 # Metadata http://label-schema.org/rc1/
 LABEL org.label-schema.vendor="o2r project" \
@@ -88,8 +71,7 @@ LABEL org.label-schema.vendor="o2r project" \
       org.label-schema.vcs-url=$VCS_URL \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.docker.schema-version="rc1" \
-      info.o2r.meta.version=$META_VERSION
+      org.label-schema.docker.schema-version="rc1"
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["npm", "start" ]
