@@ -23,6 +23,7 @@ const backoff = require('backoff');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const colors = require('colors');
+const Docker = require('dockerode');
 
 // check fs & create dirs if necessary
 const fse = require('fs-extra');
@@ -61,7 +62,6 @@ app.use(responseTime());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-
 const url = require('url');
 
 // Passport & session modules for authenticating users.
@@ -73,6 +73,9 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const dispatch = require('./controllers/dispatch').dispatch;
 
 const slackbot = require('./lib/slack');
+
+// only instantiate once
+global.docker = new Docker();
 
 /*
  *  Authentication & Authorization
@@ -176,19 +179,17 @@ function initApp(callback) {
     }
 
     /*
-     * Check Docker access and meta image
+     * Check Docker access and meta container
      */
-    Docker = require('dockerode');
-    docker = new Docker();
     docker.ping((err, data) => {
       if (err) {
         debug('Error pinging Docker: %s'.yellow, err);
         throw err;
       } else {
         debug('Docker available? %s', data);
-        debug('meta tools version: %s', config.meta.toolContainer);
+        debug('meta tools version: %s', config.meta.container.image);
 
-        docker.pull(config.meta.toolContainer, function (err, stream) {
+        docker.pull(config.meta.container.image, function (err, stream) {
           if(err) {
             debug('error pulling meta image: %s', err);
           } else {
@@ -198,8 +199,6 @@ function initApp(callback) {
               } else {
                 debug('pulled meta tools image: %s', JSON.stringify(output));
               }
-              delete docker;
-              delete Docker;
             }
 
             docker.modem.followProgress(stream, onFinished);  

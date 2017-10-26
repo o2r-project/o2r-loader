@@ -73,8 +73,19 @@ c.bagit.validation.failUpload = true;
 
 // metadata extraction options
 c.meta = {};
-c.meta.toolContainer = env.LOADER_META_TOOL_CONTAINER || 'o2rproject/o2r-meta:latest';
-c.meta.versionFile = 'version';
+c.meta.container = {};
+c.meta.container.image = env.LOADER_META_TOOL_CONTAINER || 'o2rproject/o2r-meta:latest';
+c.meta.container.default_create_options = {
+  CpuShares: 128,
+  Env: ['O2RPLATFORM=true'],
+  Memory: 1073741824, // 1G
+  MemorySwap: 2147483648, // double of 1G
+  //NetworkMode: 'none',
+  AutoRemove: true
+};
+// https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#start-a-container
+c.meta.container.default_start_options = {
+};
 
 c.meta.extract = {};
 c.meta.extract.module = 'extract';
@@ -83,6 +94,16 @@ c.meta.extract.targetElement = 'o2r';
 c.meta.extract.bestCandidateFile = 'metadata_raw.json';
 c.meta.extract.failOnNoMetadata = true;
 c.meta.extract.stayOffline = true;
+
+c.meta.broker = {}; 
+c.meta.broker.module = 'broker';
+c.meta.broker.mappings = {
+  o2r: {
+    targetElement: 'o2r',
+    file: 'metadata_o2r.json',
+    mappingFile: 'broker/mappings/o2r-map.json'
+  } 
+}; 
 
 // Encoding check settings
 // A list of analyzed files can be found here: https://github.com/o2r-project/o2r-meta#supported-files-and-formats-for-the-metadata-extraction-process

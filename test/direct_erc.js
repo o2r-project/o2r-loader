@@ -23,12 +23,12 @@ const config = require('../config/config');
 
 require("./setup")
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
-const requestLoadingTimeout = 10000;
+const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
-describe('Direct upload of ERC', function () {
-    describe('POST /api/v1/compendium response with executable ERC', () => {
+describe.only('Direct upload of ERC', function () {
+    describe.only('POST /api/v1/compendium response with executable ERC', () => {
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
