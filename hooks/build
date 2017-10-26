@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# https://docs.docker.com/docker-cloud/builds/advanced/#override-build-test-or-push-commands
-# https://github.com/rossf7/label-schema-automated-build
-
-#https://gist.github.com/DarrenN/8c6a5b969481725a4413
 PACKAGE_VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json)
 
 echo "Build hook running for version" $PACKAGE_VERSION
