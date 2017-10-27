@@ -27,8 +27,8 @@ const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
-describe.only('Direct upload of ERC', function () {
-    describe.only('POST /api/v1/compendium response with executable ERC', () => {
+describe('Direct upload of ERC', function () {
+    describe('POST /api/v1/compendium response with executable ERC', () => {
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 

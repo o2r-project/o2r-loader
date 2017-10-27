@@ -74,9 +74,6 @@ const dispatch = require('./controllers/dispatch').dispatch;
 
 const slackbot = require('./lib/slack');
 
-// only instantiate once
-global.docker = new Docker();
-
 /*
  *  Authentication & Authorization
  *  This is be needed in every service that wants to check if a user is authenticated.
@@ -181,6 +178,7 @@ function initApp(callback) {
     /*
      * Check Docker access and meta container
      */
+    docker = new Docker();
     docker.ping((err, data) => {
       if (err) {
         debug('Error pinging Docker: %s'.yellow, err);
@@ -199,6 +197,7 @@ function initApp(callback) {
               } else {
                 debug('pulled meta tools image: %s', JSON.stringify(output));
               }
+              delete docker;
             }
 
             docker.modem.followProgress(stream, onFinished);  

@@ -334,11 +334,12 @@ describe('Zenodo loader', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                let responsebody = JSON.parse(body);
-                assert.isUndefined(responsebody.id, 'returned no id');
-                assert.include(responsebody.error, 'download failed:');
-                assert.include(responsebody.error, 'sandbox.zenodo.org/record/69114/files/not_existing_file.xyz');
-                assert.notInclude(responsebody.error, config.fs.base);
+                let response = JSON.parse(body);
+                assert.isUndefined(response.id, 'returned no id');
+                console.log(response);
+                assert.include(response.error, 'download failed:');
+                assert.include(response.error, 'sandbox.zenodo.org/record/69114/files/not_existing_file.xyz');
+                assert.notInclude(JSON.stringify(response.error), config.fs.base);
                 done();
             });
         }).timeout(10000);

@@ -80,11 +80,7 @@ c.meta.container.default_create_options = {
   Env: ['O2RPLATFORM=true'],
   Memory: 1073741824, // 1G
   MemorySwap: 2147483648, // double of 1G
-  //NetworkMode: 'none',
-  AutoRemove: true
-};
-// https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#start-a-container
-c.meta.container.default_start_options = {
+  User: 'o2r' // could be left away because of USER o2r command in o2r-meta's Dockerfile, but better safe than sorry.
 };
 
 c.meta.extract = {};

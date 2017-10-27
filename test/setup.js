@@ -123,5 +123,7 @@ before(function () {
         if (err) throw err;
     });
 
+    sleep.sleep(1);
+    db.close();
     console.log('Global setup completed for database ' + dbpath);
 });

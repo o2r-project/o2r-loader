@@ -105,9 +105,9 @@ The file `Dockerfile` describes the Docker image published at [Docker Hub](https
 ```bash
 docker build --tag loader .
 
-docker run --name mongodb -d -p 27017:27017 mongo:3.4
+docker run --name mongodb -d mongo:3.4
 
-docker run --name testloader -it -p 8088:8088 -v /var/run/docker.sock:/var/run/docker.sock --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
+docker run --name testloader -it -p 8888:8088 -v /var/run/docker.sock:/var/run/docker.sock --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
 ```
 
 ## License
