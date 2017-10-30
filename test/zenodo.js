@@ -336,7 +336,6 @@ describe('Zenodo loader', function () {
                 assert.ifError(err);
                 let response = JSON.parse(body);
                 assert.isUndefined(response.id, 'returned no id');
-                console.log(response);
                 assert.include(response.error, 'download failed:');
                 assert.include(response.error, 'sandbox.zenodo.org/record/69114/files/not_existing_file.xyz');
                 assert.notInclude(JSON.stringify(response.error), config.fs.base);

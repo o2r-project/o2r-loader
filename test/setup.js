@@ -16,7 +16,8 @@
  */
 
 /* eslint-env mocha */
-var mongojs = require('mongojs');
+const mongojs = require('mongojs');
+const sleep = require('sleep');
 const config = require('../config/config');
 
 // test parameters for local session authentication directly via fixed database entries

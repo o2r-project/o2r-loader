@@ -23,7 +23,7 @@ const config = require('../config/config');
 
 require("./setup")
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
-const requestLoadingTimeout = 10000;
+const requestLoadingTimeout = 20000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
@@ -70,7 +70,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
         }).timeout(requestLoadingTimeout);
     });
 
-    describe('metadata after loading', function() {
+    describe('metadata brokering after loading without publishing', function() {
         it('should have detected the correct main and display file candidates', (done) => {
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie_o2r);
@@ -78,8 +78,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
             let get = {
                 uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
                 method: 'GET',
-                jar: j,
-                timeout: 10000
+                jar: j
             };
 
             request(get, (err, res, body) => {
@@ -172,7 +171,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     done();
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
 
         it('should contain the correct values for properties compendium and bag', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -189,8 +188,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     let get = {
                         uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
                         method: 'GET',
-                        jar: j,
-                        timeout: requestLoadingTimeout
+                        jar: j
                     };
 
                     request(get, (err, res, body) => {
@@ -204,7 +202,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     });
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
     });
 });
 
@@ -223,10 +221,10 @@ describe('Direct upload of minimal workspace (rmd)', function () {
                     done();
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
     });
 
-    describe('POST /api/v1/compendium brokering result', () => {
+    describe('POST /api/v1/compendium metadata brokering result', () => {
         let compendium_id = '';
 
         let j = request.jar();
