@@ -23,11 +23,24 @@ const config = require('../config/config');
 
 require("./setup")
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
-const requestLoadingTimeout = 10000;
+const requestLoadingTimeout = 20000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
 describe('Direct upload of minimal workspace (script) without basedir', function () {
+    var compendium_id = null;
+
+    before(function (done) {
+        this.timeout(requestLoadingTimeout);
+        let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
+        req.timeout = requestLoadingTimeout;
+        request(req, (err, res, body) => {
+            assert.ifError(err);
+            compendium_id = JSON.parse(body).id;
+            done();
+        });
+    });
+
     describe('POST /api/v1/compendium to create a new compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -55,26 +68,27 @@ describe('Direct upload of minimal workspace (script) without basedir', function
                 });
             });
         }).timeout(requestLoadingTimeout);
+    });
 
-
-        it.skip('should have detected the correct main and display file', (done) => {
+    describe('metadata brokering after loading without publishing', function() {
+        it('should have detected the correct main and display file candidates', (done) => {
             let j = request.jar();
             let ck = request.cookie('connect.sid=' + cookie_o2r);
             j.setCookie(ck, global.test_host);
             let get = {
                 uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
                 method: 'GET',
-                jar: j,
-                timeout: 10000
+                jar: j
             };
 
             request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
-
+                assert.property(response, 'metadata');
+                assert.property(response.metadata, 'o2r');
                 assert.propertyVal(response.metadata.o2r, 'mainfile', 'main.R');
-                assert.propertyVal(response.metadata.o2r, 'viewfile', 'display.png');
-
+                assert.include(response.metadata.o2r.displayfile_candidates, 'display.png');
+                assert.propertyVal(response.metadata.o2r, 'displayfile', 'display.png');
                 done();
             });
         });
@@ -157,7 +171,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     done();
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
 
         it('should contain the correct values for properties compendium and bag', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
@@ -174,8 +188,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     let get = {
                         uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
                         method: 'GET',
-                        jar: j,
-                        timeout: requestLoadingTimeout
+                        jar: j
                     };
 
                     request(get, (err, res, body) => {
@@ -189,7 +202,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
                     });
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
     });
 });
 
@@ -208,10 +221,10 @@ describe('Direct upload of minimal workspace (rmd)', function () {
                     done();
                 });
             });
-        }).timeout(requestLoadingTimeout);
+        }).timeout(requestLoadingTimeout * 2);
     });
 
-    describe('POST /api/v1/compendium processing result', () => {
+    describe('POST /api/v1/compendium metadata brokering result', () => {
         let compendium_id = '';
 
         let j = request.jar();
@@ -239,38 +252,25 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             });
         });
 
-        it('should have the extracted metadata from the header in the compendium metadata (if accessed as the uploading user)', (done) => {
+        it('should have the extracted metadata from the header in the compendium main file', (done) => {
             request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
 
                 assert.propertyVal(response.metadata.o2r, 'title', 'Capacity of container ships in seaborne trade from 1980 to 2016 (in million dwt)*');
                 assert.propertyVal(response.metadata.o2r, 'description', 'Capacity of container ships in seaborne trade of the world container ship fleet.\n');
-                assert.equal(response.metadata.o2r.author.length, 1);
-                assert.propertyVal(response.metadata.o2r.author[0], 'affiliation', 'o2r team');
-                assert.propertyVal(response.metadata.o2r, 'paperSource', 'main.Rmd'); // if this breaks, the skipped test below can be updated
-
+                
                 done();
             });
         });
 
-        it.skip('should have detected the correct main and display file', (done) => {
-            let j = request.jar();
-            let ck = request.cookie('connect.sid=' + cookie_o2r);
-            j.setCookie(ck, global.test_host);
-            let get = {
-                uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
-                method: 'GET',
-                jar: j,
-                timeout: 10000
-            };
-
+        it('should have detected the correct main and display file', (done) => {
             request(get, (err, res, body) => {
                 assert.ifError(err);
                 let response = JSON.parse(body);
 
                 assert.propertyVal(response.metadata.o2r, 'mainfile', 'main.Rmd');
-                assert.propertyVal(response.metadata.o2r, 'viewfile', 'display.html');
+                assert.propertyVal(response.metadata.o2r, 'displayfile', 'display.html');
 
                 done();
             });
@@ -342,4 +342,56 @@ describe('Direct upload of minimal workspace (rmd)', function () {
             });
         }).timeout(requestLoadingTimeout);
     });
+});
+
+describe('Direct upload of minimal workspace (rmd) with data file', function () {
+    describe('POST /api/v1/compendium processing result', () => {
+        let compendium_id = '';
+
+        let j = request.jar();
+        let ck = request.cookie('connect.sid=' + cookie_o2r);
+        j.setCookie(ck, global.test_host);
+        let get = {
+            method: 'GET',
+            jar: j,
+            timeout: 10000
+        };
+
+        before(function (done) {
+            request(global.test_host + '/api/v1/compendium', (err, res, body) => {
+                this.timeout(requestLoadingTimeout);
+                let req = createCompendiumPostRequest('./test/workspace/minimal-rmd-data', cookie_o2r, 'workspace');
+
+                request(req, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+                    compendium_id = response.id;
+                    get.uri = global.test_host_read + '/api/v1/compendium/' + compendium_id;
+                    done();
+                });
+            });
+        });
+
+        it('should list the data file along with three other files/directories', (done) => {
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie_o2r);
+            j.setCookie(ck, global.test_host);
+            let get = {
+                uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                method: 'GET',
+                jar: j,
+                timeout: 10000
+            };
+
+            request(get, (err, res, body) => {
+                assert.ifError(err);
+                let response = JSON.parse(body);
+                assert.lengthOf(response.files.children, 4); // .erc, data.csv, display.html, main.Rmd
+                assert.include(JSON.stringify(response.files.children), compendium_id + '/data/data.csv');
+                done();
+            });
+        });
+    });
+
 });

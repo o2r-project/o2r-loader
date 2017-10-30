@@ -165,7 +165,7 @@ describe('Sciebo loader with compendia', function () {
         }).timeout(20000);;
     });
 
-    // not implemented yet, must be able to load specific file
+    // not implemented yet, must be able to load specific file: https://github.com/o2r-project/o2r-loader/issues/14
     describe.skip('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
         it('should respond with an error', (done) => {
             let form = {

@@ -13,15 +13,11 @@ Currently, it implements the endpoint `/api/v1/compendium`.
 
 ## Requirements
 
-Requirements:
-
-- Node.js `>= 6.2`
-- npm
-- Python `>= 3.x`
+- Node.js `>=8`
 - bagit-python (`bagit.py`)
-- o2r-meta (`o2rmeta.py`)
+- Docker socket access for running o2r-meta
 - unzip
-- mongodb
+- wget
 
 ## Configuration
 
@@ -35,10 +31,8 @@ The configuration can be done via environment variables.
   Which database inside the mongo db should be used. Defaults to `muncher`.
 - `LOADER_BASEPATH`
   The local path where compendia are stored. Defaults to `/tmp/o2r/`.
-- `LOADER_META_TOOL_EXE` __Required__
-  Executable for metadata tools, defaults to `python3 ../o2r-meta/o2rmeta.py`. You will very likely need to change this.
-- `LOADER_META_EXTRACT_MAPPINGS_DIR` __Required__
-  Path to extraction mappings, defaults to `../o2r-meta/broker/mappings`. You will very likely need to change this.
+- `LOADER_META_TOOL_CONTAINER`
+  Docker image name and tag for metadata tools, defaults to running latest [o2r-meta in a container](https://github.com/o2r-project/o2r-meta#using-docker), i.e. `o2rproject/o2r-meta:latest`.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 - `SLACK_BOT_TOKEN`
@@ -111,9 +105,9 @@ The file `Dockerfile` describes the Docker image published at [Docker Hub](https
 ```bash
 docker build --tag loader .
 
-docker run --name mongodb -d -p 27017:27017 mongo:3.4
+docker run --name mongodb -d mongo:3.4
 
-docker run --name testloader -it -p 8088:8088 --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
+docker run --name testloader -it -p 8888:8088 -v /var/run/docker.sock:/var/run/docker.sock --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
 ```
 
 ## License
