@@ -77,7 +77,7 @@ c.meta.container = {};
 c.meta.container.image = env.LOADER_META_TOOL_CONTAINER || 'o2rproject/o2r-meta:latest';
 c.meta.container.default_create_options = {
   CpuShares: 128,
-  Env: ['O2RPLATFORM=true'],
+  Env: ['O2R_LOADER=true'],
   Memory: 1073741824, // 1G
   MemorySwap: 2147483648, // double of 1G
   User: 'o2r' // could be left away because of USER o2r command in o2r-meta's Dockerfile, but better safe than sorry.
