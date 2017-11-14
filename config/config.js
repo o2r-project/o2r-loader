@@ -80,7 +80,7 @@ c.meta.container.default_create_options = {
   Env: ['O2R_LOADER=true'],
   Memory: 1073741824, // 1G
   MemorySwap: 2147483648, // double of 1G
-  User: env.LOADER_META_TOOL_CONTAINER_USER || 'o2r' // or '1000', could be left away because of USER o2r command in o2r-meta's Dockerfile, but better safe than sorry.
+  User: env.LOADER_META_TOOL_CONTAINER_USER || 'o2r' // or '1000', which works FOR LOCAL DEVELOPMENT.
 };
 
 c.meta.extract = {};
