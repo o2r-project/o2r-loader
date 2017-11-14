@@ -107,9 +107,11 @@ The file `Dockerfile` describes the Docker image published at [Docker Hub](https
 ```bash
 docker build --tag loader .
 
-docker run --name mongodb -d mongo:3.4
+docker run --name mongodb -d -p 27017:27017 mongo:3.4
+docker run --name testmuncher -d -p 8080:8080 --link mongodb:mongodb -v /tmp/o2r:/tmp/o2r -v /var/run/docker.sock:/var/run/docker.sock -e MUNCHER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* o2rproject/o2r-muncher:latest
+docker run --name testbouncer -d -p 8083:8083 --link mongodb:mongodb -v /tmp/o2r:/tmp/o2r -e BOUNCER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* -e OAUTH_CLIENT_ID=... -e OAUTH_CLIENT_SECRET=... -e  OAUTH_URL_CALLBACK=http://localhost/api/v1/auth/login o2rproject/o2r-bouncer:latest
 
-docker run --name testloader -it -p 8888:8088 -v /var/run/docker.sock:/var/run/docker.sock --link mongodb:mongodb -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
+docker run --name testloader -it -p 8088:8088 --link mongodb:mongodb -v /tmp/o2r:/tmp/o2r -v /var/run/docker.sock:/var/run/docker.sock -e LOADER_MONGODB=mongodb://mongodb:27017 -e DEBUG=* loader
 ```
 
 ## License
