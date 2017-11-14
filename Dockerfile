@@ -74,7 +74,7 @@ LABEL org.label-schema.vendor="o2r project" \
       org.label-schema.docker.schema-version="rc1"
 
 # If running in a container the app is root, so the second order container also must have root access, otherwise permission problems
-#ENV LOADER_META_TOOL_CONTAINER_USER=root
+ENV LOADER_META_TOOL_CONTAINER_USER=root
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["npm", "start" ]
