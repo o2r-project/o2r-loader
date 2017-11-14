@@ -33,6 +33,8 @@ The configuration can be done via environment variables.
   The local path where compendia are stored. Defaults to `/tmp/o2r/`.
 - `LOADER_META_TOOL_CONTAINER`
   Docker image name and tag for metadata tools, defaults to running latest [o2r-meta in a container](https://github.com/o2r-project/o2r-meta#using-docker), i.e. `o2rproject/o2r-meta:latest`.
+- `LOADER_META_TOOL_CONTAINER_USER`
+  User name or id for the [user running the container](https://docs.docker.com/engine/reference/run/#user), defaults to `o2r`.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 - `SLACK_BOT_TOKEN`
