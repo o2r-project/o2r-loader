@@ -6,7 +6,8 @@ node_js:
 services:
   - docker
 before_install:
-  - docker pull o2rproject/o2r-muncher:latest 
+  - docker pull o2rproject/o2r-muncher:latest
+  - docker pull o2rproject/o2r-meta:latest
   - docker pull mongo:3.4 
 install:
   - npm install
