@@ -20,7 +20,7 @@ RUN apk add --no-cache \
   python2 \
   && python2 -m ensurepip \
   && rm -r /usr/lib/python*/ensurepip \
-  && pip install --upgrade pip setuptools \
+  && pip install --upgrade pip setuptools setuptools_scm \
   && if [ ! -e /usr/bin/pip ]; then ln -s pip /usr/bin/pip ; fi \
   && if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python2 /usr/bin/python; fi \
   && rm -r /root/.cache
@@ -33,7 +33,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/reposito
 RUN apk add --no-cache \
     unzip \
     dumb-init \
-    # needed for loading
+    # needed for loading from external http(s) sources
     wget \
     openssl \
     # needed for npm install gyp
