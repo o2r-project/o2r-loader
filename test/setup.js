@@ -19,6 +19,7 @@
 const mongojs = require('mongojs');
 const sleep = require('sleep');
 const config = require('../config/config');
+const debug = require('debug')('test:setup');
 
 // test parameters for local session authentication directly via fixed database entries
 var orcid = '0000-0001-6021-1617';
@@ -32,7 +33,7 @@ var sessionId_admin = 'hJRjapOTVCEvlMYCb8BXovAOi2PEOC4i';
 var env = process.env;
 global.test_host = env.TEST_HOST || 'http://localhost:' + config.net.port;
 global.test_host_read = env.TEST_HOST_READ || 'http://localhost:8080';
-console.log('Testing endpoint at ' + global.test_host);
+debug('Testing endpoint at ' + global.test_host);
 
 before(function () {
     let dbpath = 'localhost/' + config.mongo.database;
@@ -126,5 +127,5 @@ before(function () {
 
     sleep.sleep(1);
     db.close();
-    console.log('Global setup completed for database ' + dbpath);
+    debug('Global setup completed for database ' + dbpath);
 });

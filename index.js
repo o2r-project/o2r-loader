@@ -100,12 +100,12 @@ fse.mkdirsSync(config.fs.compendium);
 const multer = require('multer');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    debug('Saving userfile %s to %s', file.originalname, config.fs.incoming);
+    debug('Saving user\'s file %s to %s', file.originalname, config.fs.incoming);
     cb(null, config.fs.incoming);
   },
   filename: (req, file, cb) => {
     let id = randomstring.generate(config.id_length);
-    debug('Generated id "%s" for file %s from fieldname %s', id, file.originalname, file.fieldname);
+    debug('Generated id "%s" for file %s from field name %s', id, file.originalname, file.fieldname);
     cb(null, id);
   }
 });
@@ -115,8 +115,8 @@ function initApp(callback) {
   debug('Initialize application');
 
   try {
-    // configure express-session, stores reference to authdetails in cookie.
-    // authdetails themselves are stored in MongoDBStore
+    // configure express-session, stores reference to auth details in cookie.
+    // auth details themselves are stored in MongoDBStore
     var mongoStore = new MongoDBStore({
       uri: config.mongo.location + config.mongo.database,
       collection: 'sessions'
@@ -131,7 +131,7 @@ function initApp(callback) {
     });
 
     app.use(session({
-      secret: config.sessionsecret,
+      secret: config.sessionSecret,
       resave: true,
       saveUninitialized: true,
       maxAge: 60 * 60 * 24 * 7, // cookies become invalid after one week
