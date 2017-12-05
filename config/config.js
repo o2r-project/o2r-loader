@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+const yn = require('yn');
+const debug = require('debug')('loader:config');
+
 var c = {};
 c.net = {};
 c.mongo = {};
@@ -22,6 +25,12 @@ c.encoding = {};
 c.webdav = {};
 c.zenodo = {};
 var env = process.env;
+
+debug('Configuring loader with environment variables %s', Object
+  .keys(env)
+  .filter(k => k.startsWith("LOADER"))
+  .map(k => { return k + "=" + env[k]; })
+);
 
 // Information about loader
 c.api_version = 1;
@@ -35,15 +44,17 @@ c.mongo.initial_connection_max_delay = 5000;
 c.mongo.initial_connection_initial_delay = 1000;
 
 // fix mongo location if trailing slash was omitted
-if (c.mongo.location[c.mongo.location.length-1] !== '/') {
+if (c.mongo.location[c.mongo.location.length - 1] !== '/') {
   c.mongo.location += '/';
 }
 
 // fs paths
-c.fs.base       = env.LOADER_BASEPATH || '/tmp/o2r/';
-c.fs.incoming   = c.fs.base + 'incoming/';
+c.fs.base = env.LOADER_BASEPATH || '/tmp/o2r/';
+c.fs.incoming = c.fs.base + 'incoming/';
 c.fs.compendium = c.fs.base + 'compendium/';
 c.fs.keepIncomingArchive = false;
+
+c.fs.volume = env.LOADER_VOLUME || null;
 
 c.id_length = 5; // length of compendium ids [0-9,a-z,A-Z]
 
@@ -82,6 +93,7 @@ c.meta.container.default_create_options = {
   MemorySwap: 2147483648, // double of 1G
   User: env.LOADER_META_TOOL_CONTAINER_USER || 'o2r' // or '1000', which works FOR LOCAL DEVELOPMENT.
 };
+c.meta.container.rm = yn(env.LOADER_META_TOOL_CONTAINER_RM) || false;
 
 c.meta.extract = {};
 c.meta.extract.module = 'extract';
@@ -89,17 +101,17 @@ c.meta.extract.outputDir = '.erc';
 c.meta.extract.targetElement = 'o2r';
 c.meta.extract.bestCandidateFile = 'metadata_raw.json';
 c.meta.extract.failOnNoMetadata = true;
-c.meta.extract.stayOffline = true;
+c.meta.extract.stayOffline = yn(env.LOADER_META_TOOL_OFFLINE) || false;
 
-c.meta.broker = {}; 
+c.meta.broker = {};
 c.meta.broker.module = 'broker';
 c.meta.broker.mappings = {
   o2r: {
     targetElement: 'o2r',
     file: 'metadata_o2r.json',
     mappingFile: 'broker/mappings/o2r-map.json'
-  } 
-}; 
+  }
+};
 
 // Encoding check settings
 // A list of analyzed files can be found here: https://github.com/o2r-project/o2r-meta#supported-files-and-formats-for-the-metadata-extraction-process
@@ -127,6 +139,8 @@ c.slack.bot_token = process.env.SLACK_BOT_TOKEN;
 c.slack.verification_token = process.env.SLACK_VERIFICATION_TOKEN;
 c.slack.channel = {};
 c.slack.channel.status = process.env.SLACK_CHANNEL_STATUS || '#monitoring';
-c.slack.channel.loadEvents = process.env.SLACK_CHANNEL_LOAD ||'#monitoring';
+c.slack.channel.loadEvents = process.env.SLACK_CHANNEL_LOAD || '#monitoring';
+
+debug('CONFIGURATION:\n%s', JSON.stringify(c));
 
 module.exports = c;

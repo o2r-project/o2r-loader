@@ -31,10 +31,16 @@ The configuration can be done via environment variables.
   Which database inside the mongo db should be used. Defaults to `muncher`.
 - `LOADER_BASEPATH`
   The local path where compendia are stored. Defaults to `/tmp/o2r/`.
+- `LOADER_VOLUME`
+  The name of the volume where compendia are stored, needed for mounting the correct path to 2nd level containers in compose configurations; overrides `LOADER_BASEPATH` for the metadata tools containers. Not set by default.
 - `LOADER_META_TOOL_CONTAINER`
   Docker image name and tag for metadata tools, defaults to running latest [o2r-meta in a container](https://github.com/o2r-project/o2r-meta#using-docker), i.e. `o2rproject/o2r-meta:latest`.
 - `LOADER_META_TOOL_CONTAINER_USER`
   User name or id for the [user running the container](https://docs.docker.com/engine/reference/run/#user), defaults to `o2r`.
+- `LOADER_META_TOOL_CONTAINER_RM`
+  Remove the metadata extraction and brokering containers after completion, defaults to `true`.
+- `LOADER_META_TOOL_OFFLINE`
+  Do not go online during metadata extraction to retrieve additional metadata, defaults to `false`.
 - `SESSION_SECRET`
   String used to sign the session ID cookie, must match other microservices.
 - `SLACK_BOT_TOKEN`
