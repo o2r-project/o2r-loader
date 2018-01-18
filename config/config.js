@@ -15,6 +15,7 @@
  *
  */
 const yn = require('yn');
+const util = require('util');
 const debug = require('debug')('loader:config');
 
 var c = {};
@@ -120,7 +121,8 @@ c.encoding.textFileRegex = '\.(txt|rmd|r|json|yml|yaml)$';
 c.encoding.confidenceThreshold = 60;
 
 c.webdav.allowedHosts = ['sciebo'];
-c.webdav.urlString = 'public.php/webdav'; //end of webdav public webdav url
+c.webdav.sciebo = {};
+c.webdav.sciebo.webdav_path = '/public.php/webdav/'; //end of webdav public webdav url
 //c.webdav.urlString = 'nextcloud/public.php/dav'; //nextcloud public webdav url
 
 // Zenodo configuration
@@ -141,6 +143,6 @@ c.slack.channel = {};
 c.slack.channel.status = process.env.SLACK_CHANNEL_STATUS || '#monitoring';
 c.slack.channel.loadEvents = process.env.SLACK_CHANNEL_LOAD || '#monitoring';
 
-debug('CONFIGURATION:\n%s', JSON.stringify(c));
+debug('CONFIGURATION:\n%s', util.inspect(c, { depth: null, colors: true }));
 
 module.exports = c;
