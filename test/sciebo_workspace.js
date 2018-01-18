@@ -30,7 +30,7 @@ describe('Sciebo loader with workspaces', function () {
     describe('create new compendium based on a workspace in a public WebDAV', () => {
         it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/96XJFrmd3cSYGko',
+                share_url: 'https://uni-muenster.sciebo.de/s/96XJFrmd3cSYGko',
                 content_type: 'workspace'
             };
 
@@ -97,7 +97,7 @@ describe('Sciebo loader with workspaces', function () {
 
         it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/VEX8Bd88hPAm7fa',
+                share_url: 'https://uni-muenster.sciebo.de/s/VEX8Bd88hPAm7fa',
                 path: '/my-research',
                 content_type: 'workspace'
             };
