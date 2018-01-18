@@ -16,7 +16,7 @@ doi: http://dx.doi.org/10.5555/666655554444
 ---
 
 ```{r plot, echo=FALSE}
-data <- read.csv(file = "data.csv")
+data <- read.csv("data.csv")
 barplot(height = data$capacity, names.arg = data$year, ylab = "capacity", sub = "(c) Statista 2017")
 ```
 
