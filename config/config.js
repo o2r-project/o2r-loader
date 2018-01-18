@@ -93,7 +93,7 @@ c.meta.container.default_create_options = {
   MemorySwap: 2147483648, // double of 1G
   User: env.LOADER_META_TOOL_CONTAINER_USER || 'o2r' // or '1000', which works FOR LOCAL DEVELOPMENT.
 };
-c.meta.container.rm = yn(env.LOADER_META_TOOL_CONTAINER_RM) || false;
+c.meta.container.rm = yn(env.LOADER_META_TOOL_CONTAINER_RM) || true;
 
 c.meta.extract = {};
 c.meta.extract.module = 'extract';
