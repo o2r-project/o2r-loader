@@ -16,6 +16,7 @@
  */
 const yn = require('yn');
 const util = require('util');
+const path = require('path');
 const debug = require('debug')('loader:config');
 
 var c = {};
@@ -51,8 +52,8 @@ if (c.mongo.location[c.mongo.location.length - 1] !== '/') {
 
 // fs paths
 c.fs.base = env.LOADER_BASEPATH || '/tmp/o2r/';
-c.fs.incoming = c.fs.base + 'incoming/';
-c.fs.compendium = c.fs.base + 'compendium/';
+c.fs.incoming = path.join(c.fs.base, 'incoming/');
+c.fs.compendium = path.join(c.fs.base, 'compendium');
 c.fs.keepIncomingArchive = false;
 
 c.fs.volume = env.LOADER_VOLUME || null;
