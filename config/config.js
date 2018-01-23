@@ -110,7 +110,7 @@ c.meta.broker.module = 'broker';
 c.meta.broker.mappings = {
   o2r: {
     targetElement: 'o2r',
-    file: 'metadata_o2r.json',
+    file: 'metadata_o2r_1.json',
     mappingFile: 'broker/mappings/o2r-map.json'
   }
 };
