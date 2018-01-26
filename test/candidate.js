@@ -42,8 +42,8 @@ describe('Candidate handling after direct upload of', function () {
 
         before(function (done) {
             let req = createCompendiumPostRequest('./test/erc/with_metadata', cookie_o2r);
-            this.timeout(10000);
-            req.timeout = 10000;
+            this.timeout(60000);
+            req.timeout = 30000;
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -107,8 +107,8 @@ describe('Candidate handling after direct upload of', function () {
 
         before(function (done) {
             let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
-            this.timeout(10000);
-            req.timeout = 10000;
+            this.timeout(60000);
+            req.timeout = 30000;
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -194,8 +194,8 @@ describe('Candidate handling after direct upload of', function () {
 
         before(function (done) {
             let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, 'workspace');
-            this.timeout(10000);
-            req.timeout = 10000;
+            this.timeout(60000);
+            req.timeout = 30000;
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
@@ -268,6 +268,3 @@ describe('Candidate handling after direct upload of', function () {
         }).timeout(requestLoadingTimeout);
     });
 });
-
-
-

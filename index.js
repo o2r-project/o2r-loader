@@ -39,7 +39,6 @@ var dbOptions = {
   reconnectTries: Number.MAX_VALUE,
   keepAlive: 30000,
   socketTimeoutMS: 30000,
-  useMongoClient: true,
   promiseLibrary: mongoose.Promise
 };
 mongoose.connection.on('error', (err) => {
