@@ -28,7 +28,7 @@ const requestLoadingTimeout = 2000;
 
 describe('Direct upload of invalid files', function () {
 
-    describe('POST /api/v1/compendium invalid.zip (not a zip file)', () => {
+    describe('Create compendium with invalid.zip (not a zip file)', () => {
         it('should respond with HTTP 500 error', (done) => {
             let formData = {
                 'content_type': 'compendium',
@@ -116,7 +116,7 @@ describe('Direct upload of invalid files', function () {
         });
     });
 
-    describe('POST /api/v1/compendium empty.zip (empty zip file)', () => {
+    describe('Create compendium with empty.zip (empty zip file)', () => {
         it('should respond with ERROR 500 and valid JSON document', (done) => {
             let formData = {
                 'content_type': 'compendium',
@@ -200,7 +200,7 @@ describe('Direct upload of invalid files', function () {
         });
     });
 
-    describe('POST /api/v1/compendium unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
+    describe('Create compendium with unsupported_encoding.zip (encoding: SHIFT_JIS)', () => {
         it('should respond with HTTP 422 error', (done) => {
             let formData = {
                 'content_type': 'compendium',

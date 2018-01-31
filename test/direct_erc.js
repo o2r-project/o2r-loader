@@ -28,7 +28,7 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 
 
 describe('Direct upload of ERC', function () {
-    describe('POST /api/v1/compendium response with executable ERC', () => {
+    describe('Create compendium with executable ERC', () => {
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
@@ -126,7 +126,7 @@ describe('Direct upload of ERC', function () {
         }).timeout(requestLoadingTimeout);
     });
 
-    describe('POST /api/v1/compendium with invalid bag', () => {
+    describe('Create compendium with invalid bag', () => {
         it('should fail the upload because bag is invalid', (done) => {
             let req = createCompendiumPostRequest('./test/erc/invalid_bag', cookie_o2r);
 
@@ -149,7 +149,7 @@ describe('Direct upload of ERC', function () {
         }).timeout(requestLoadingTimeout);
     });
 
-    describe.skip('POST /api/v1/compendium with virus', () => {
+    describe.skip('Create compendium with virus', () => {
         it('upload compendium should fail and return an error message about infected files', (done) => {
             let req = createCompendiumPostRequest('./test/erc/virustainer', cookie);
             request(req, (err, res, body) => {

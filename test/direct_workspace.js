@@ -41,7 +41,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
         });
     });
 
-    describe('POST /api/v1/compendium to create a new compendium', () => {
+    describe('Create compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-script', cookie_o2r, 'workspace');
@@ -96,7 +96,7 @@ describe('Direct upload of minimal workspace (script) without basedir', function
 });
 
 describe('Direct upload of minimal workspace (script) _with_ basedir', function () {
-    describe('POST /api/v1/compendium to create a new compendium', () => {
+    describe('Create compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-script-basedir', cookie_o2r, 'workspace');
@@ -159,7 +159,7 @@ describe('Direct upload of minimal workspace (script) _with_ basedir', function 
 });
 
 describe('Direct upload of minimal workspace (script) as bag', function () {
-    describe('POST /api/v1/compendium to create a new compendium', () => {
+    describe('Create compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-script-bag', cookie_o2r, 'workspace');
@@ -207,7 +207,7 @@ describe('Direct upload of minimal workspace (script) as bag', function () {
 });
 
 describe('Direct upload of minimal workspace (rmd)', function () {
-    describe('POST /api/v1/compendium to create a new compendium', () => {
+    describe('Create compendium', () => {
         it('should respond with HTTP 200 OK and valid JSON, including the ID field', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r, 'workspace');
@@ -224,7 +224,7 @@ describe('Direct upload of minimal workspace (rmd)', function () {
         }).timeout(requestLoadingTimeout * 2);
     });
 
-    describe('POST /api/v1/compendium metadata brokering result', () => {
+    describe('Metadata brokering result after compendium creation', () => {
         let compendium_id = '';
 
         let j = request.jar();
@@ -277,7 +277,7 @@ describe('Direct upload of minimal workspace (rmd)', function () {
         });
     });
 
-    describe('POST /api/v1/compendium to create a new compendium with different content types', () => {
+    describe('Create compendium with different content types', () => {
         it('should respond with HTTP 400 with valid JSON and error message when using no content_type', (done) => {
             request(global.test_host + '/api/v1/compendium', (err, res, body) => {
                 let req = createCompendiumPostRequest('./test/workspace/minimal-rmd', cookie_o2r);
@@ -345,7 +345,7 @@ describe('Direct upload of minimal workspace (rmd)', function () {
 });
 
 describe('Direct upload of minimal workspace (rmd) with data file', function () {
-    describe('POST /api/v1/compendium processing result', () => {
+    describe('Create compendium', () => {
         let compendium_id = '';
 
         let j = request.jar();
