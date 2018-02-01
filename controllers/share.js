@@ -19,6 +19,7 @@
 const config = require('../config/config');
 const debug = require('debug')('loader:ctrl:share');
 const fs = require('fs');
+const path = require('path');
 
 const Compendium = require('../lib/model/compendium');
 const Loader = require('../lib/loader').Loader;
@@ -108,8 +109,14 @@ exports.create = (req, res) => {
 };
 
 function prepareScieboLoad(req, res) {
-  if (!req.body.path) { // set default value for path ('/')
-    req.body.path = '/';
+  if (!req.body.path || !req.body.path.startsWith('/')) { // set default value for path ('/')
+    req.body.path = '/' + req.body.path;
+  }
+
+  //handle directly submitted zip file
+  if (req.body.path.endsWith('.zip')){
+      req.zipFile = path.basename(req.body.path);
+      req.body.path = path.dirname(req.body.path);
   }
 
   // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
