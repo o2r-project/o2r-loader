@@ -134,9 +134,9 @@ function prepareScieboLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadOwncloud((data, err) => {
     if (err) {
-      debug('Error during public share load from owncloud: %s', JSON.stringify(err));
+      debug('Error during public share load from owncloud: %o', err);
     } else {
-      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+      debug('New compendium successfully loaded: %o', data);
 
       if (config.slack.enable) {
         let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;
@@ -171,9 +171,9 @@ function prepareZenodoLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadZenodo((data, err) => {
     if (err) {
-      debug('Error during public share load from Zenodo: %s', JSON.stringify(err));
+      debug('Error during public share load from Zenodo: %o', err);
     } else {
-      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+      debug('New compendium successfully loaded: %o', data);
 
       if (config.slack.enable) {
         let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;

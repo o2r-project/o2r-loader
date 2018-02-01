@@ -170,7 +170,7 @@ function initApp(callback) {
         debug('Error starting slackbot (disabling it now): %s', err);
         config.slack.enable = false;
       }, (done) => {
-        debug('Slack bot enabled and configured - nice! %s', JSON.stringify(done));
+        debug('Slack bot enabled and configured - nice! %o', done);
       });
     }
 
@@ -192,9 +192,9 @@ function initApp(callback) {
           } else {
             function onFinished(err, output) {
               if(err) {
-                debug('error pulling meta image: %s', JSON.stringify(err));
+                debug('error pulling meta image: %o', err);
               } else {
-                debug('pulled meta tools image: %s', JSON.stringify(output));
+                debug('pulled meta tools image: %O', output);
               }
               delete docker;
             }
