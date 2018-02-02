@@ -109,8 +109,10 @@ exports.create = (req, res) => {
 };
 
 function prepareScieboLoad(req, res) {
-  if (!req.body.path || !req.body.path.startsWith('/')) { // set default value for path ('/')
-    req.body.path = '/' + req.body.path;
+  if (!req.body.path) { // set default value for path ('/')
+    req.body.path = '/';
+  } else if (!req.body.path.startsWith('/')) { // add '/' to beginning of path
+      req.body.path = '/' + req.body.path;
   }
 
   //handle directly submitted zip file
