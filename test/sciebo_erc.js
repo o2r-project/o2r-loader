@@ -165,12 +165,11 @@ describe('Sciebo loader with compendia', function () {
         }).timeout(20000);;
     });
 
-    // not implemented yet, must be able to load specific file: https://github.com/o2r-project/o2r-loader/issues/14
-    describe.skip('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
-        it('should respond with an error', (done) => {
+    describe('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
+        it('should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://uni-muenster.sciebo.de/index.php/s/NSqqEdjVIjhPf0N',
-                path: '/iUaMu',
+                share_url: 'https://uni-muenster.sciebo.de/s/w9Ste65jjStVlI4',
+                path: '/newtainer2.zip',
                 content_type: 'compendium'
             };
 
@@ -186,12 +185,54 @@ describe('Sciebo loader with compendia', function () {
                 timeout: requestLoadingTimeout
             }, (err, res, body) => {
                 assert.ifError(err);
-                assert.equal(res.statusCode, 400);
-                assert.isUndefined(JSON.parse(body).id, 'returned no id');
-                assert.include(JSON.parse(body).error, 'load from share failed');
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                compendium_id = JSON.parse(body).id;
                 done();
             });
         }).timeout(20000);
+
+        it('should download the files in the share and make them available via API', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/s/w9Ste65jjStVlI4',
+                path: '/newtainer2.zip',
+                content_type: 'compendium'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    form: form,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/data/document.Rmd');
+                    assert.include(JSON.stringify(response), 'data/data/document.tex');
+                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+
+                    done();
+                });
+            });
+        }).timeout(20000);;
     });
 });
 

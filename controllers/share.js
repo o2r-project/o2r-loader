@@ -19,6 +19,7 @@
 const config = require('../config/config');
 const debug = require('debug')('loader:ctrl:share');
 const fs = require('fs');
+const path = require('path');
 
 const Compendium = require('../lib/model/compendium');
 const Loader = require('../lib/loader').Loader;
@@ -110,6 +111,14 @@ exports.create = (req, res) => {
 function prepareScieboLoad(req, res) {
   if (!req.body.path) { // set default value for path ('/')
     req.body.path = '/';
+  } else if (!req.body.path.startsWith('/')) { // add '/' to beginning of path
+      req.body.path = '/' + req.body.path;
+  }
+
+  //handle directly submitted zip file
+  if (req.body.path.endsWith('.zip')){
+      req.zipFile = path.basename(req.body.path);
+      req.body.path = path.dirname(req.body.path);
   }
 
   // only allow sciebo shares, see https://www.sciebo.de/de/login/index.html
@@ -127,9 +136,9 @@ function prepareScieboLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadOwncloud((data, err) => {
     if (err) {
-      debug('Error during public share load from owncloud: %s', JSON.stringify(err));
+      debug('Error during public share load from owncloud: %o', err);
     } else {
-      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+      debug('New compendium successfully loaded: %o', data);
 
       if (config.slack.enable) {
         let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;
@@ -164,9 +173,9 @@ function prepareZenodoLoad(req, res) {
   var loader = new Loader(req, res);
   loader.loadZenodo((data, err) => {
     if (err) {
-      debug('Error during public share load from Zenodo: %s', JSON.stringify(err));
+      debug('Error during public share load from Zenodo: %o', err);
     } else {
-      debug('New compendium successfully loaded: %s', JSON.stringify(data));
+      debug('New compendium successfully loaded: %o', data);
 
       if (config.slack.enable) {
         let compendium_url = req.protocol + '://' + req.get('host') + '/api/v1/compendium/' + data.id;

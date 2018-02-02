@@ -38,7 +38,7 @@ exports.create = (req, res) => {
   let uploader = new Uploader(req, res);
   uploader.upload((id, err) => {
     if (err) {
-      debug('Error during upload: %s', JSON.stringify(err));
+      debug('Error during upload: %o', err);
     }
     else {
       debug('New compendium %s successfully uploaded', id);
