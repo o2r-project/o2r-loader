@@ -45,10 +45,10 @@ exports.dispatch = (req, res) => {
   // a) direct upload with a file attachment
   // b) no file attachment = get from share via URL parameter
   if(req.file) {
-    debug('Detected file in request, dispatching to direct upload: %s', JSON.stringify(req.file));
+    debug('Detected file in request, dispatching to direct upload: %o', req.file);
     createFromDirectUpload(req, res);
   } else {
-    debug('Detected _no_ file in request, dispatching to share upload: %s', JSON.stringify(req.body));
+    debug('Detected _no_ file in request, dispatching to share upload: %O', req.body);
     createFromShare(req, res);
   }  
 };

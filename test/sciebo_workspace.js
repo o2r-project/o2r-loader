@@ -211,6 +211,73 @@ describe('Sciebo loader with workspaces', function () {
             });
         }).timeout(20000);
     });
+
+    describe('create new compendium based on a workspace in a public WebDAV that contains a directory', () => {
+        it('should respond with a compendium ID', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/s/Dct9JUTgnhAtZaM',
+                path: '/',
+                content_type: 'workspace'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.isObject(JSON.parse(body), 'returned JSON');
+                assert.isDefined(JSON.parse(body).id, 'returned id');
+                done();
+            });
+        }).timeout(20000);
+
+        it('should download the files in the workspace and list them via the API', (done) => {
+            let form = {
+                share_url: 'https://uni-muenster.sciebo.de/s/Dct9JUTgnhAtZaM',
+                content_type: 'workspace'
+            };
+
+            let j = request.jar();
+            let ck = request.cookie('connect.sid=' + cookie);
+            j.setCookie(ck, global.test_host);
+
+            request({
+                uri: global.test_host + '/api/v1/compendium',
+                method: 'POST',
+                jar: j,
+                form: form,
+                timeout: requestLoadingTimeout
+            }, (err, res, body) => {
+                assert.ifError(err);
+                let compendium_id = JSON.parse(body).id;
+
+                request({
+                    uri: global.test_host_read + '/api/v1/compendium/' + compendium_id,
+                    method: 'GET',
+                    jar: j,
+                    timeout: requestLoadingTimeout
+                }, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    let response = JSON.parse(body);
+
+                    assert.include(JSON.stringify(response), 'data/main.Rmd');
+                    assert.include(JSON.stringify(response), 'data/display.html');
+                    assert.include(JSON.stringify(response), 'data/subDirectory/data.csv');
+
+                    done();
+                });
+            });
+        }).timeout(20000);
+    });
 });
 
 describe('Sciebo loader with invalid requests', () => {
