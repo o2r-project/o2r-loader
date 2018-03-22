@@ -84,6 +84,9 @@ c.bagit.validation = {};
 c.bagit.validation.fast = false;
 c.bagit.validation.failUpload = true;
 
+c.bagtainer = {};
+c.bagtainer.id_regex = /^[^-_.\n\r][a-zA-Z0-9\._-]*[^-_.\n\r]$/;
+
 // metadata extraction options
 c.meta = {};
 c.meta.container = {};
