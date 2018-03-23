@@ -106,6 +106,17 @@ TEST_HOST=http://localhost:80 npm test
 ```
 For this, the loader has to run locally or as part of a docker-compose configuration.
 
+### Public shares
+
+The tests for public shares (`sciebo_erc.js`, `sciebo_workspace.js` and `zenodo.js`) use ERC uploaded to the respective services.
+
+They can be found at
+
+* Sciebo: [public link](https://uni-muenster.sciebo.de/index.php/s/h5tNYXsS1Bsv4qr) | [private link](https://uni-muenster.sciebo.de/f/749265161)
+* Zenodo: https://sandbox.zenodo.org/deposit/69114
+
+For information on which share URL belongs to which compendium, see the file `README` in the [`integration_test_shares`](https://uni-muenster.sciebo.de/index.php/s/h5tNYXsS1Bsv4qr) folder.
+
 ## Dockerfile
 
 The file `Dockerfile` describes the Docker image published at [Docker Hub](https://hub.docker.com/r/o2rproject/o2r-loader/).
