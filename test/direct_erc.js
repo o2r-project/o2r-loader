@@ -21,7 +21,7 @@ const request = require('request');
 const fs = require('fs');
 const config = require('../config/config');
 
-require("./setup")
+require("./setup");
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
@@ -144,6 +144,52 @@ describe('Direct upload of ERC', function () {
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.notInclude(body, config.fs.base);
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+
+    describe('POST /api/v1/compendium with invalid id in bag', () => {
+        it('should fail the upload because bag ID is invalid (contains invalid chars)', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 400);
+                assert.include(body, 'Invalid id found in compendium detection file');
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+
+        it('should not tell about internal server configuration in the error message', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.notInclude(body, config.fs.base);
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+
+    describe('POST /api/v1/compendium with two compendia with the same ID', () => {
+        it('should respond with HTTP 200 OK for the first compendium', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+
+        it('should fail the second upload because bag ID is already used', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 400);
+                assert.include(body, 'ID already exists');
                 done();
             });
         }).timeout(requestLoadingTimeout);

@@ -20,7 +20,7 @@ const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
 
-require("./setup")
+require("./setup");
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9ydziuJ+DzFG9GnAZRvaaM';
 const requestLoadingTimeout = 20000;
@@ -94,7 +94,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        }).timeout(20000);;
+        }).timeout(20000);
     });
 
     describe('create new compendium based on public WebDAV share with one zip file', () => {
@@ -162,7 +162,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        }).timeout(20000);;
+        }).timeout(20000);
     });
 
     describe('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
