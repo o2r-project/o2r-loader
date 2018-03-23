@@ -19,6 +19,7 @@
 const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
+const mongojs = require('mongojs');
 
 require("./setup");
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
@@ -27,6 +28,12 @@ const requestLoadingTimeout = 20000;
 
 
 describe('Sciebo loader with compendia', function () {
+    var db = mongojs('localhost/muncher', ['compendia']);
+    beforeEach(function(done) {
+        db.compendia.drop(function (err, doc) {
+            done();
+        });
+    });
     let compendium_id = '';
 
     describe('create new compendium based on public WebDAV share with bagit.txt', () => {

@@ -20,6 +20,7 @@ const assert = require('chai').assert;
 const request = require('request');
 const fs = require('fs');
 const config = require('../config/config');
+const mongojs = require('mongojs');
 
 require("./setup");
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
@@ -28,7 +29,19 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 
 
 describe('Direct upload of ERC', function () {
+    var db = mongojs('localhost/muncher', ['compendia']);
+    beforeEach(function(done) {
+        db.compendia.drop(function (err, doc) {
+            done();
+        });
+    });
+
     describe('POST /api/v1/compendium response with executable ERC', () => {
+        before(function(done) {
+            db.compendia.drop(function (err, doc) {
+                done();
+            });
+        });
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
@@ -184,7 +197,7 @@ describe('Direct upload of ERC', function () {
         }).timeout(requestLoadingTimeout);
 
         it('should fail the second upload because bag ID is already used', (done) => {
-            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
