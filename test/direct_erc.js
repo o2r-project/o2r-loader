@@ -37,11 +37,6 @@ describe('Direct upload of ERC', function () {
     });
 
     describe('POST /api/v1/compendium response with executable ERC', () => {
-        before(function(done) {
-            db.compendia.drop(function (err, doc) {
-                done();
-            });
-        });
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
@@ -72,13 +67,14 @@ describe('Direct upload of ERC', function () {
             });
         }).timeout(requestLoadingTimeout);
 
-        it('should give a response including the id field', (done) => {
+        it('should give a response including the id specified in erc.yml', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.isDefined(JSON.parse(body).id, 'returned id');
                 assert.property(JSON.parse(body), 'id');
+                assert.equal(JSON.parse(body).id, 'KIbebWnPlx');
                 done();
             });
         }).timeout(requestLoadingTimeout);
@@ -187,23 +183,20 @@ describe('Direct upload of ERC', function () {
 
     describe('POST /api/v1/compendium with two compendia with the same ID', () => {
         it('should respond with HTTP 200 OK for the first compendium', (done) => {
+
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
-                done();
-            });
-        }).timeout(requestLoadingTimeout);
+                let req2 = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
-        it('should fail the second upload because bag ID is already used', (done) => {
-            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
-
-            request(req, (err, res, body) => {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 400);
-                assert.include(body, 'ID already exists');
-                done();
+                request(req2, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                    assert.include(body, 'ID already exists');
+                    done();
+                });
             });
         }).timeout(requestLoadingTimeout);
     });

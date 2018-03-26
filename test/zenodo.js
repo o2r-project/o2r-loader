@@ -19,18 +19,24 @@
 const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
+const mongojs = require('mongojs');
 
-require("./setup")
+require("./setup");
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 20000;
 
 
 describe('Zenodo loader', function () {
-
-    var compendium_id = '';
+    const db = mongojs('localhost/muncher', ['compendia']);
+    beforeEach(function(done) {
+        db.compendia.drop(function (err, doc) {
+            done();
+        });
+    });
+    let compendium_id = '';
 
     describe('create new compendium based on a zenodo record', () => {
-        it('zenodo record: should respond with a compendium ID', (done) => {
+        it('zenodo record: should respond with the compendium ID specified in erc.yml', (done) => {
             let form = {
                 share_url: 'https://sandbox.zenodo.org/record/69114',
                 content_type: 'compendium'
@@ -51,7 +57,7 @@ describe('Zenodo loader', function () {
                 assert.equal(res.statusCode, 200);
                 assert.isObject(JSON.parse(body), 'returned JSON');
                 assert.isDefined(JSON.parse(body).id, 'returned id');
-                compendium_id = JSON.parse(body).id;
+                assert.equal(JSON.parse(body).id, '66b173cb682d6');
                 done();
             });
         }).timeout(30000);

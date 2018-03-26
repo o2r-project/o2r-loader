@@ -37,7 +37,7 @@ describe('Sciebo loader with compendia', function () {
     let compendium_id = '';
 
     describe('create new compendium based on public WebDAV share with bagit.txt', () => {
-        it('should respond with a compendium ID', (done) => {
+        it('should respond with the compendium ID specified in erc.yml', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/7Y7U4HC8GzJr5b9',
                 content_type: 'compendium'
@@ -58,7 +58,7 @@ describe('Sciebo loader with compendia', function () {
                 assert.equal(res.statusCode, 200);
                 assert.isObject(JSON.parse(body), 'returned JSON');
                 assert.isDefined(JSON.parse(body).id, 'returned id');
-                compendium_id = JSON.parse(body).id;
+                assert.equal(JSON.parse(body).id, '6afbdbc29965');
                 done();
             });
         }).timeout(20000);
@@ -96,7 +96,7 @@ describe('Sciebo loader with compendia', function () {
 
                     assert.include(JSON.stringify(response), 'data/data/test2.Rmd');
                     assert.include(JSON.stringify(response), 'data/data/test.txt');
-                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+                    assert.include(JSON.stringify(response), 'data/data/erc.yml');
 
                     done();
                 });
@@ -234,7 +234,7 @@ describe('Sciebo loader with compendia', function () {
 
                     assert.include(JSON.stringify(response), 'data/data/document.Rmd');
                     assert.include(JSON.stringify(response), 'data/data/document.tex');
-                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+                    assert.include(JSON.stringify(response), 'data/data/erc.yml');
 
                     done();
                 });
