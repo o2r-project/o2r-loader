@@ -36,6 +36,10 @@ describe('Direct upload of ERC', function () {
         });
     });
 
+    after(function(done) {
+       db.close();
+    });
+
     describe('POST /api/v1/compendium response with executable ERC', () => {
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
@@ -126,9 +130,8 @@ describe('Direct upload of ERC', function () {
                     let response = JSON.parse(body);
                     assert.property(response, 'metadata');
                     assert.property(response.metadata, 'o2r');
-                    assert.property(response.metadata.o2r, 'ercIdentifier');
-                    //assert.propertyVal(response.metadata.o2r, 'ercIdentifier', 'KIbebWnPlx');
-                    //assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
+                    assert.property(response.metadata.o2r, 'publication_date');
+                    assert.propertyVal(response.metadata.id, 'KIbebWnPlx');
                     done();
                 });
             });

@@ -38,7 +38,7 @@ describe('Zenodo loader', function () {
     describe('create new compendium based on a zenodo record', () => {
         it('zenodo record: should respond with the compendium ID specified in erc.yml', (done) => {
             let form = {
-                share_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/212213',
                 content_type: 'compendium'
             };
 
@@ -64,7 +64,7 @@ describe('Zenodo loader', function () {
 
         it('zenodo record, additional "filename" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/212213',
                 filename: 'metatainer.zip',
                 content_type: 'compendium'
             };
@@ -91,7 +91,7 @@ describe('Zenodo loader', function () {
 
         it('zenodo record, "doi" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                doi: '10.5072/zenodo.69114', // intenally taken apart and using sandbox
+                doi: '10.5072/zenodo.212213', // intenally taken apart and using sandbox
                 content_type: 'compendium'
             };
 
@@ -117,7 +117,7 @@ describe('Zenodo loader', function () {
 
         it('zenodo record, "doi.org" as "share_url": should respond with a compendium ID', (done) => {
             let form = {
-                share_url: 'http://doi.org/10.5072/zenodo.69114', // page not found, internally using only id in sandbox.zenodo.org
+                share_url: 'http://doi.org/10.5072/zenodo.212213', // page not found, internally using only id in sandbox.zenodo.org
                 filename: 'metatainer.zip',
                 content_type: 'compendium'
             };
@@ -144,7 +144,7 @@ describe('Zenodo loader', function () {
 
         it('zenodo record, "zenodo_record_id" parameter: should respond with a compendium ID', (done) => {
             let form = {
-                zenodo_record_id: '69114',
+                zenodo_record_id: '212213',
                 content_type: 'compendium'
             };
 
@@ -172,7 +172,7 @@ describe('Zenodo loader', function () {
     describe('No new compendium based on invalid parameters', () => {
         it('invalid zenodo URL: should respond with an error 422', (done) => {
             let form = {
-                share_url: 'htts?///sandbox.zenodo.org/record/69114',
+                share_url: 'htts?///sandbox.zenodo.org/record/212213',
                 filename: 'metatainer.zip',
                 content_type: 'compendium',
             };
@@ -198,7 +198,7 @@ describe('Zenodo loader', function () {
 
         it('host not allowed (not a zenodo record): should respond with an error 403', (done) => {
             let form = {
-                share_url: 'https://sandbox.ODONEZ.org/record/69114',
+                share_url: 'https://sandbox.ODONEZ.org/record/212213',
                 filename: 'metatainer.zip',
                 content_type: 'compendium',
             };
@@ -299,7 +299,7 @@ describe('Zenodo loader', function () {
 
         it('filename not found: should respond with an error 500', (done) => {
             let form = {
-                share_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/212213',
                 filename: 'not_existing_file.xyz',
                 content_type: 'compendium',
             };
@@ -323,7 +323,7 @@ describe('Zenodo loader', function () {
 
         it('filename not found: should respond with a useful but not talkative error message', (done) => {
             let form = {
-                share_url: 'https://sandbox.zenodo.org/record/69114',
+                share_url: 'https://sandbox.zenodo.org/record/212213',
                 filename: 'not_existing_file.xyz',
                 content_type: 'compendium',
             };
@@ -343,7 +343,7 @@ describe('Zenodo loader', function () {
                 let response = JSON.parse(body);
                 assert.isUndefined(response.id, 'returned no id');
                 assert.include(response.error, 'download failed:');
-                assert.include(response.error, 'sandbox.zenodo.org/record/69114/files/not_existing_file.xyz');
+                assert.include(response.error, 'sandbox.zenodo.org/record/212213/files/not_existing_file.xyz');
                 assert.notInclude(JSON.stringify(response.error), config.fs.base);
                 done();
             });
