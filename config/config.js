@@ -74,7 +74,7 @@ c.user.level.create_compendium = 100;
 // compendium configuration
 c.compendium = {};
 c.compendium.supportedContentTypes = ["compendium", "workspace"];
-c.compendium.detectionFileName = 'erc.yml';
+c.compendium.configurationFileName = 'erc.yml';
 c.compendium.supportedVersions = ['0.1', '1'];
 
 c.bagit = {};
