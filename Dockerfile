@@ -12,33 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM node:8-alpine
-# FROM alpine:3.6 does not work because of https://github.com/sonicdoe/detect-character-encoding/issues/8
+FROM node:8-slim
+# FROM alpine:3.6 and node:8-alpine does not work because of https://github.com/sonicdoe/detect-character-encoding/issues/8
 
 # Python, based on frolvlad/alpine-python3
-RUN apk add --no-cache \
-  python2 \
-  && python2 -m ensurepip \
-  && rm -r /usr/lib/python*/ensurepip \
-  && pip install --upgrade pip setuptools setuptools_scm \
-  && if [ ! -e /usr/bin/pip ]; then ln -s pip /usr/bin/pip ; fi \
-  && if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python2 /usr/bin/python; fi \
-  && rm -r /root/.cache
-
-# Add Alpine mirrors, replacing default repositories with edge ones, based on https://github.com/jfloff/alpine-python/blob/master/3.4/Dockerfile
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
-
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
+    python \
+    python-pip \
     unzip \
-    dumb-init \
-    # needed for loading from external http(s) sources
-    wget \
-    openssl \
     # needed for npm install gyp
     make \
     g++ \
+  && wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb \
+  && dpkg -i dumb-init_*.deb \
   && pip install bagit
 
 # Install app
@@ -46,7 +32,7 @@ WORKDIR /loader
 COPY package.json package.json
 RUN npm install --production
 
-RUN apk del \
+RUN apt-get purge -y \
   make \
   g++ \
   && rm -rf /var/cache
