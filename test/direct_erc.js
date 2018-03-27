@@ -21,6 +21,8 @@ const request = require('request');
 const fs = require('fs');
 const config = require('../config/config');
 const mongojs = require('mongojs');
+const path = require('path');
+const exec = require('child_process').exec;
 
 require("./setup");
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
@@ -31,13 +33,23 @@ const createCompendiumPostRequest = require('./util').createCompendiumPostReques
 describe('Direct upload of ERC', function () {
     var db = mongojs('localhost/muncher', ['compendia']);
     beforeEach(function(done) {
+        // 1. Delete database compendium collection
         db.compendia.drop(function (err, doc) {
-            done();
+            // 2. Delete compendium files
+            let cmd = 'rm -rf ' + path.join(config.fs.compendium, '*');
+            exec(cmd, (error, stdout, stderr) => {
+                if (error || stderr) {
+                    assert.ifError(error);
+                } else {
+                    done();
+                }
+            });
         });
     });
 
-    after(function(done) {
-       db.close();
+    after(function (done) {
+        db.close();
+        done();
     });
 
     describe('POST /api/v1/compendium response with executable ERC', () => {
@@ -131,7 +143,7 @@ describe('Direct upload of ERC', function () {
                     assert.property(response, 'metadata');
                     assert.property(response.metadata, 'o2r');
                     assert.property(response.metadata.o2r, 'publication_date');
-                    assert.propertyVal(response.metadata.id, 'KIbebWnPlx');
+                    assert.propertyVal(response, 'id', 'KIbebWnPlx');
                     done();
                 });
             });

@@ -39,7 +39,7 @@ describe('Sciebo loader with compendia', function () {
             let cmd = 'rm -rf ' + path.join(config.fs.compendium, '*');
             exec(cmd, (error, stdout, stderr) => {
                 if (error || stderr) {
-                    console.log(error);
+                    assert.ifError(error);
                 } else {
                     done();
                 }
