@@ -31,7 +31,7 @@ const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
-describe.only('Direct upload of ERC', function () {
+describe('Direct upload of ERC', function () {
     var db = mongojs('localhost/muncher', ['compendia']);
 
     beforeEach(function(done) {
