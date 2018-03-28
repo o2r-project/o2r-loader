@@ -19,18 +19,54 @@
 const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
+const mongojs = require('mongojs');
+const fs = require('fs-extra');
+const env = process.env;
+const path = require('path');
+const exec = require('child_process').exec;
 
-require("./setup")
+require("./setup");
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9ydziuJ+DzFG9GnAZRvaaM';
-const requestLoadingTimeout = 20000;
-
+const requestLoadingTimeout = 30000;
 
 describe('Sciebo loader with compendia', function () {
+    var db = mongojs('localhost/muncher', ['compendia']);
+
+    beforeEach(function(done) {
+        // 1. Delete database compendium collection
+        if(env.TRAVIS === "true") {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                let cmd = 'docker exec testloader rm -rf ' + path.join(config.fs.compendium, '*');
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error || stderr) {
+                        assert.ifError(error);
+                    } else {
+                        done();
+                    }
+                });
+            });
+        } else {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                fs.emptyDir(config.fs.compendium, err => {
+                    if (err) assert.ifError(err);
+                    done();
+                });
+            });
+        }
+    });
+
+    after(function (done) {
+        db.close();
+        done();
+    });
+
     let compendium_id = '';
 
     describe('create new compendium based on public WebDAV share with bagit.txt', () => {
-        it('should respond with a compendium ID', (done) => {
+        it('should respond with the compendium ID specified in erc.yml', (done) => {
             let form = {
                 share_url: 'https://uni-muenster.sciebo.de/index.php/s/7Y7U4HC8GzJr5b9',
                 content_type: 'compendium'
@@ -51,7 +87,7 @@ describe('Sciebo loader with compendia', function () {
                 assert.equal(res.statusCode, 200);
                 assert.isObject(JSON.parse(body), 'returned JSON');
                 assert.isDefined(JSON.parse(body).id, 'returned id');
-                compendium_id = JSON.parse(body).id;
+                assert.equal(JSON.parse(body).id, '6afbdbc29965');
                 done();
             });
         }).timeout(20000);
@@ -89,12 +125,12 @@ describe('Sciebo loader with compendia', function () {
 
                     assert.include(JSON.stringify(response), 'data/data/test2.Rmd');
                     assert.include(JSON.stringify(response), 'data/data/test.txt');
-                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+                    assert.include(JSON.stringify(response), 'data/data/erc.yml');
 
                     done();
                 });
             });
-        }).timeout(20000);;
+        }).timeout(20000);
     });
 
     describe('create new compendium based on public WebDAV share with one zip file', () => {
@@ -162,7 +198,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        }).timeout(20000);;
+        }).timeout(20000);
     });
 
     describe('create new compendium based on specific zip file in public WebDAV share with multiple zip files', () => {
@@ -227,7 +263,7 @@ describe('Sciebo loader with compendia', function () {
 
                     assert.include(JSON.stringify(response), 'data/data/document.Rmd');
                     assert.include(JSON.stringify(response), 'data/data/document.tex');
-                    assert.include(JSON.stringify(response), 'data/data/bagtainer.yml');
+                    assert.include(JSON.stringify(response), 'data/data/erc.yml');
 
                     done();
                 });

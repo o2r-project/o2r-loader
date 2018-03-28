@@ -74,7 +74,7 @@ c.user.level.create_compendium = 100;
 // compendium configuration
 c.compendium = {};
 c.compendium.supportedContentTypes = ["compendium", "workspace"];
-c.compendium.detectionFileName = 'erc.yml';
+c.compendium.configurationFileName = 'erc.yml';
 c.compendium.supportedVersions = ['0.1', '1'];
 
 c.bagit = {};
@@ -83,6 +83,9 @@ c.bagit.payloadDirectory = 'data';
 c.bagit.validation = {};
 c.bagit.validation.fast = false;
 c.bagit.validation.failUpload = true;
+
+c.bagtainer = {};
+c.bagtainer.id_regex = /^[^-_.\n\r][a-zA-Z0-9\._-]*[^-_.\n\r]$/;
 
 // metadata extraction options
 c.meta = {};

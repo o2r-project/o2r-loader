@@ -18,16 +18,52 @@
 /* eslint-env mocha */
 const assert = require('chai').assert;
 const request = require('request');
-const fs = require('fs');
 const config = require('../config/config');
+const mongojs = require('mongojs');
+const fs = require('fs-extra');
+const env = process.env;
+const path = require('path');
+const exec = require('child_process').exec;
 
-require("./setup")
+require("./setup");
 const cookie_o2r = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
 describe('Direct upload of ERC', function () {
+    var db = mongojs('localhost/muncher', ['compendia']);
+
+    beforeEach(function(done) {
+        // 1. Delete database compendium collection
+        if(env.TRAVIS === "true") {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                let cmd = 'docker exec testloader rm -rf ' + path.join(config.fs.compendium, '*');
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error || stderr) {
+                        assert.ifError(error);
+                    } else {
+                        done();
+                    }
+                });
+            });
+        } else {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                fs.emptyDir(config.fs.compendium, err => {
+                    if (err) assert.ifError(err);
+                    done();
+                });
+            });
+        }
+    });
+
+    after(function (done) {
+        db.close();
+        done();
+    });
+
     describe('POST /api/v1/compendium response with executable ERC', () => {
         it('should respond with HTTP 200 OK', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
@@ -59,13 +95,14 @@ describe('Direct upload of ERC', function () {
             });
         }).timeout(requestLoadingTimeout);
 
-        it('should give a response including the id field', (done) => {
+        it('should give a response including the id specified in erc.yml', (done) => {
             let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
 
             request(req, (err, res, body) => {
                 assert.ifError(err);
                 assert.isDefined(JSON.parse(body).id, 'returned id');
                 assert.property(JSON.parse(body), 'id');
+                assert.equal(JSON.parse(body).id, 'KIbebWnPlx');
                 done();
             });
         }).timeout(requestLoadingTimeout);
@@ -117,9 +154,8 @@ describe('Direct upload of ERC', function () {
                     let response = JSON.parse(body);
                     assert.property(response, 'metadata');
                     assert.property(response.metadata, 'o2r');
-                    assert.property(response.metadata.o2r, 'ercIdentifier');
-                    //assert.propertyVal(response.metadata.o2r, 'ercIdentifier', 'KIbebWnPlx');
-                    //assert.propertyVal(response.metadata.o2r, 'title', 'This is the title: it contains a colon');
+                    assert.property(response.metadata.o2r, 'publication_date');
+                    assert.propertyVal(response, 'id', 'KIbebWnPlx');
                     done();
                 });
             });
@@ -145,6 +181,49 @@ describe('Direct upload of ERC', function () {
                 assert.ifError(err);
                 assert.notInclude(body, config.fs.base);
                 done();
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+
+    describe('POST /api/v1/compendium with invalid id in bag', () => {
+        it('should fail the upload because bag ID is invalid (contains invalid chars)', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 400);
+                assert.include(body, 'Invalid id found in compendium detection file');
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+
+        it('should not tell about internal server configuration in the error message', (done) => {
+            let req = createCompendiumPostRequest('./test/erc/invalid_id', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.notInclude(body, config.fs.base);
+                done();
+            });
+        }).timeout(requestLoadingTimeout);
+    });
+
+    describe('POST /api/v1/compendium with two compendia with the same ID', () => {
+        it('should respond with HTTP 200 OK for the first compendium', (done) => {
+
+            let req = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+
+            request(req, (err, res, body) => {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                let req2 = createCompendiumPostRequest('./test/erc/executable', cookie_o2r);
+
+                request(req2, (err, res, body) => {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 400);
+                    assert.include(body, 'ID already exists');
+                    done();
+                });
             });
         }).timeout(requestLoadingTimeout);
     });
