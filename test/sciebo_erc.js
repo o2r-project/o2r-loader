@@ -28,7 +28,7 @@ const exec = require('child_process').exec;
 require("./setup");
 const cookie = 's:C0LIrsxGtHOGHld8Nv2jedjL4evGgEHo.GMsWD5Vveq0vBt7/4rGeoH5Xx7Dd2pgZR9DvhKCyDTY';
 const cookie_plain = 's:yleQfdYnkh-sbj9Ez--_TWHVhXeXNEgq.qRmINNdkRuJ+iHGg5woRa9ydziuJ+DzFG9GnAZRvaaM';
-const requestLoadingTimeout = 20000;
+const requestLoadingTimeout = 30000;
 
 describe('Sciebo loader with compendia', function () {
     var db = mongojs('localhost/muncher', ['compendia']);
