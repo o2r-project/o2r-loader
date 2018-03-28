@@ -18,9 +18,10 @@
 /* eslint-env mocha */
 const assert = require('chai').assert;
 const request = require('request');
-const fs = require('fs');
 const config = require('../config/config');
 const mongojs = require('mongojs');
+const fs = require('fs-extra');
+const env = process.env;
 const path = require('path');
 const exec = require('child_process').exec;
 
@@ -30,21 +31,32 @@ const requestLoadingTimeout = 15000;
 const createCompendiumPostRequest = require('./util').createCompendiumPostRequest;
 
 
-describe('Direct upload of ERC', function () {
+describe.only('Direct upload of ERC', function () {
     var db = mongojs('localhost/muncher', ['compendia']);
+
     beforeEach(function(done) {
         // 1. Delete database compendium collection
-        db.compendia.drop(function (err, doc) {
-            // 2. Delete compendium files
-            let cmd = 'rm -rf ' + path.join(config.fs.compendium, '*');
-            exec(cmd, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    assert.ifError(error);
-                } else {
-                    done();
-                }
+        if(env.TRAVIS === "true") {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                let cmd = 'docker exec testloader rm -rf ' + path.join(config.fs.compendium, '*');
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error || stderr) {
+                        assert.ifError(error);
+                    } else {
+                        done();
+                    }
+                });
             });
-        });
+        } else {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                fs.emptyDir(config.fs.compendium, err => {
+                    if (err) assert.ifError(err);
+                    done();
+                });
+            });
+        }
     });
 
     after(function (done) {

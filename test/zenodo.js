@@ -20,6 +20,8 @@ const assert = require('chai').assert;
 const request = require('request');
 const config = require('../config/config');
 const mongojs = require('mongojs');
+const fs = require('fs-extra');
+const env = process.env;
 const path = require('path');
 const exec = require('child_process').exec;
 
@@ -29,20 +31,31 @@ const requestLoadingTimeout = 20000;
 
 
 describe('Zenodo loader', function () {
-    const db = mongojs('localhost/muncher', ['compendia']);
+    var db = mongojs('localhost/muncher', ['compendia']);
+
     beforeEach(function(done) {
         // 1. Delete database compendium collection
-        db.compendia.drop(function (err, doc) {
-            // 2. Delete compendium files
-            let cmd = 'rm -rf ' + path.join(config.fs.compendium, '*');
-            exec(cmd, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    assert.ifError(error);
-                } else {
-                    done();
-                }
+        if(env.TRAVIS === "true") {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                let cmd = 'docker exec testloader rm -rf ' + path.join(config.fs.compendium, '*');
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error || stderr) {
+                        assert.ifError(error);
+                    } else {
+                        done();
+                    }
+                });
             });
-        });
+        } else {
+            db.compendia.drop(function (err, doc) {
+                // 2. Delete compendium files
+                fs.emptyDir(config.fs.compendium, err => {
+                    if (err) assert.ifError(err);
+                    done();
+                });
+            });
+        }
     });
 
     after(function (done) {
