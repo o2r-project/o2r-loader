@@ -1,0 +1,3 @@
+Payload-Oxum: 122.3
+Bagging-Date: 2017-09-20
+Bag-Size: 0.8 KB

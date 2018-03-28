@@ -1,6 +1,6 @@
 {
   "name": "o2r-loader",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Node.js implementation for loading compendia and workspaces from external repositories for the [o2r web api](http://o2r.info/o2r-web-api).",
   "main": "index.js",
   "scripts": {
@@ -36,6 +36,7 @@
     "express-session": "^1.15.6",
     "fs-extra": "^4.0.2",
     "htmlparser2": "^3.9.2",
+    "js-yaml": "^3.11.0",
     "mimos": "^4.0.0",
     "mongoose": "^4.13.2",
     "mongoose-timestamp": "^0.6.0",
@@ -48,7 +49,7 @@
     "recursive-readdir": "^2.2.1",
     "request": "^2.83.0",
     "response-time": "^2.3.2",
-    "slack": "^9.0.9",
+    "slack": "^11.0.0",
     "util": "^0.10.3",
     "validator": "^9.1.1",
     "webdav": "^1.1.0",
