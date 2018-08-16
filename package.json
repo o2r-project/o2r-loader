@@ -1,7 +1,7 @@
 {
   "name": "o2r-loader",
   "version": "0.12.0",
-  "description": "Node.js implementation for loading compendia and workspaces from external repositories for the [o2r web api](http://o2r.info/o2r-web-api).",
+  "description": "Node.js implementation for loading compendia and workspaces from external repositories for the [o2r API](https://o2r.info/api).",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/o2r-project/o2r-loader.git"
   },
-  "author": "o2r project (http://o2r.info)",
+  "author": "o2r project (https://o2r.info)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/o2r-project/o2r-loader/issues"

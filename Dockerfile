@@ -50,7 +50,7 @@ ARG BUILD_DATE
 
 # Metadata http://label-schema.org/rc1/
 LABEL org.label-schema.vendor="o2r project" \
-      org.label-schema.url="http://o2r.info" \
+      org.label-schema.url="https://o2r.info" \
       org.label-schema.name="o2r loader" \
       org.label-schema.description="compendium and workspace loading from uploaded files and cloud resources" \    
       org.label-schema.version=$VERSION \
