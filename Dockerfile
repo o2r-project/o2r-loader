@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM node:8-slim
+FROM node:12-slim
 # FROM alpine:3.6 and node:8-alpine does not work because of https://github.com/sonicdoe/detect-character-encoding/issues/8
 
 # Python, based on frolvlad/alpine-python3
