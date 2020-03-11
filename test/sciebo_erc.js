@@ -268,7 +268,7 @@ describe('Sciebo loader with compendia', function () {
                     done();
                 });
             });
-        }).timeout(20000);;
+        }).timeout(20000);
     });
 });
 

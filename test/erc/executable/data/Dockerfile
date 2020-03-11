@@ -1,3 +1,3 @@
 FROM alpine
-MAINTAINER <http://o2r.info>
+MAINTAINER <https://o2r.info>
 CMD ["uname", "-a" ]
