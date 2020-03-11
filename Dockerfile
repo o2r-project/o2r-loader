@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
   && wget https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64.deb \
   && dpkg -i dumb-init_*.deb \
+  && pip install --upgrade setuptools \
   && pip install bagit
 
 # Install app
