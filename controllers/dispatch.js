@@ -37,7 +37,7 @@ exports.dispatch = (req, res) => {
   }
   if (req.user.level < config.user.level.create_compendium) {
     debug('user is authenticated but level is %s, returning error', req.user.level);
-    res.status(401).send('{"error":"user level does not allow compendium creation"}');
+    res.status(403).send('{"error":"user level does not allow compendium creation"}');
     return;
   }
 

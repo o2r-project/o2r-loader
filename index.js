@@ -35,11 +35,10 @@ fse.mkdirsSync(config.fs.compendium);
 mongoose.Promise = global.Promise;
 const dbURI = config.mongo.location + config.mongo.database;
 var dbOptions = {
-  autoReconnect: true,
-  reconnectTries: Number.MAX_VALUE,
   keepAlive: 30000,
   socketTimeoutMS: 30000,
-  promiseLibrary: mongoose.Promise
+  promiseLibrary: mongoose.Promise,
+  useUnifiedTopology: true
 };
 mongoose.connection.on('error', (err) => {
   debug('Could not connect to MongoDB @ %s: %s', dbURI, err);
